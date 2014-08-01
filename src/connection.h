@@ -18,9 +18,12 @@
 #ifndef QFCGI_CONNECTION_H
 #define QFCGI_CONNECTION_H
 
+#include <QHash>
 #include <QObject>
 
 class QFCgi;
+class QFCgiRecord;
+class QFCgiRequest;
 class QTcpSocket;
 
 class QFCgiConnection : public QObject {
@@ -35,9 +38,13 @@ private slots:
 
 private:
   void fillBuffer();
+  void handleManagementRecord(const QFCgiRecord &record);
+  void handleApplicationRecord(const QFCgiRecord &record);
+  void handleFCGI_BEGIN_REQUEST(const QFCgiRecord &record);
 
   QTcpSocket *so;
   QByteArray buf;
+  QHash<int, QFCgiRequest*> records;
 };
 
 #endif  /* QFCGI_CONNECTION_H */
