@@ -30,8 +30,14 @@ public:
   QFCgiConnection(QTcpSocket *so, QFCgi *parent);
   ~QFCgiConnection();
 
+private slots:
+  void onReadyRead();
+
 private:
+  void fillBuffer();
+
   QTcpSocket *so;
+  QByteArray buf;
 };
 
 #endif  /* QFCGI_CONNECTION_H */

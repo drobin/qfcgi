@@ -42,7 +42,13 @@ public:
   void setRequestId(quint16 requestId);
   QByteArray& getContent();
 
+  qint32 read(const QByteArray &ba);
+
 private:
+  bool setVersion(quint8 version);
+
+  qint32 readHeader(const QByteArray &ba, quint16 *contentLength, quint8 *paddingLength);
+
   enum Version version;
   quint8 type;
   quint16 requestId;

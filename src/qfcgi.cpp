@@ -39,7 +39,6 @@ void QFCgi::start() {
 
 void QFCgi::onNewConnection() {
   QTcpSocket *so = this->server->nextPendingConnection();
-  QFCgiConnection *connection = new QFCgiConnection(so, this);
-
-  delete connection;
+  new QFCgiConnection(so, this);
+  qDebug() << "FastCGI connection accepted";
 }
