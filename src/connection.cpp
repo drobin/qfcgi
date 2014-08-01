@@ -15,31 +15,15 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QTcpServer>
 #include <QTcpSocket>
 
 #include "connection.h"
 #include "qfcgi.h"
 
-QFCgi::QFCgi(QObject *parent) : QObject(parent) {
-  this->server = new QTcpServer(this);
+QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent) {
+  this->so = so;
 }
 
-QFCgi::~QFCgi() {
-
-}
-
-void QFCgi::start() {
-  this->server->listen(QHostAddress::Any, 9000);
-
-  connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-
-  qDebug() << "FastCGI application started";
-}
-
-void QFCgi::onNewConnection() {
-  QTcpSocket *so = this->server->nextPendingConnection();
-  QFCgiConnection *connection = new QFCgiConnection(so, this);
-
-  delete connection;
+QFCgiConnection::~QFCgiConnection() {
+  delete so;
 }

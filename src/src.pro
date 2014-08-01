@@ -21,7 +21,9 @@ QT        = core network
 CONFIG   += staticlib debug warn_on
 
 SOURCES = \
+  connection.cpp \
   qfcgi.cpp
 
 HEADERS += \
+  connection.h \
   qfcgi.h
