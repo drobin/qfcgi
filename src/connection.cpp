@@ -95,6 +95,7 @@ void QFCgiConnection::handleManagementRecord(QFCgiRecord &record) {
 void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
   switch (record.getType()) {
     case FCGI_BEGIN_REQUEST: handleFCGI_BEGIN_REQUEST(record); break;
+    case FCGI_PARAMS: handleFCGI_PARAMS(record); break;
   }
 }
 
@@ -111,4 +112,16 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), this);
   this->requests.insert(request->getId(), request);
   qDebug() << "new FastCGI request [ id:" << request->getId() << ", role:" << role << ", flags:" << flags << "]";
+}
+
+void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
+  QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
+
+  if (request == 0) {
+    qCritical() << "could not find request with id" << record.getRequestId();
+    deleteLater();
+    return;
+  }
+
+  qDebug() << "[" << request->getId() << "]: FCGI_PARAMS";
 }
