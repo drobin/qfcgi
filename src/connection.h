@@ -38,13 +38,13 @@ private slots:
 
 private:
   void fillBuffer();
-  void handleManagementRecord(const QFCgiRecord &record);
-  void handleApplicationRecord(const QFCgiRecord &record);
-  void handleFCGI_BEGIN_REQUEST(const QFCgiRecord &record);
+  void handleManagementRecord(QFCgiRecord &record);
+  void handleApplicationRecord(QFCgiRecord &record);
+  void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
 
   QTcpSocket *so;
   QByteArray buf;
-  QHash<int, QFCgiRequest*> records;
+  QHash<int, QFCgiRequest*> requests;
 };
 
 #endif  /* QFCGI_CONNECTION_H */

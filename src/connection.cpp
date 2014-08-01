@@ -35,6 +35,18 @@
 #define FCGI_UNKNOWN_TYPE       11
 #define FCGI_MAXTYPE (FCGI_UNKNOWN_TYPE)
 
+/*
+ * Values for role component of FCGI_BeginRequestBody
+ */
+#define FCGI_RESPONDER  1
+#define FCGI_AUTHORIZER 2
+#define FCGI_FILTER     3
+
+/*
+ * Mask for flags component of FCGI_BeginRequestBody
+ */
+#define FCGI_KEEP_CONN  1
+
 QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent) {
   this->so = so;
 
@@ -76,18 +88,27 @@ void QFCgiConnection::fillBuffer() {
   }
 }
 
-void QFCgiConnection::handleManagementRecord(const QFCgiRecord &record) {
+void QFCgiConnection::handleManagementRecord(QFCgiRecord &record) {
   qDebug() << "management record read" << record.getType() << record.getRequestId();
 }
 
-void QFCgiConnection::handleApplicationRecord(const QFCgiRecord &record) {
+void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
   switch (record.getType()) {
     case FCGI_BEGIN_REQUEST: handleFCGI_BEGIN_REQUEST(record); break;
   }
 }
 
-void QFCgiConnection::handleFCGI_BEGIN_REQUEST(const QFCgiRecord &record) {
+void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
+  QByteArray &ba = record.getContent();
+  quint16 role = ((ba[0] & 0xFF) << 8) | (ba[1] & 0xFF);
+  quint8 flags = ba[2];
+
+  if (role != FCGI_RESPONDER) {
+    // send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE
+    qCritical() << "send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE";
+  }
+
   QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), this);
-  this->records.insert(request->getId(), request);
-  qDebug() << "new FastCGI request:" << request->getId();
+  this->requests.insert(request->getId(), request);
+  qDebug() << "new FastCGI request [ id:" << request->getId() << ", role:" << role << ", flags:" << flags << "]";
 }
