@@ -22,8 +22,10 @@ CONFIG   += staticlib debug warn_on
 
 SOURCES = \
   connection.cpp \
-  qfcgi.cpp
+  qfcgi.cpp \
+  record.cpp
 
 HEADERS += \
   connection.h \
-  qfcgi.h
+  qfcgi.h \
+  record.h
