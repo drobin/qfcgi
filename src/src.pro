@@ -24,10 +24,12 @@ SOURCES = \
   connection.cpp \
   qfcgi.cpp \
   record.cpp \
-  request.cpp
+  request.cpp \
+  stream.cpp
 
 HEADERS += \
   connection.h \
   qfcgi.h \
   record.h \
-  request.h
+  request.h \
+  stream.h
