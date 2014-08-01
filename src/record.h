@@ -29,9 +29,18 @@ public:
     V1 = 1
   };
 
+  enum ProtocolStatus {
+    FCGI_REQUEST_COMPLETE = 0,
+    FCGI_CANT_MPX_CONN = 1,
+    FCGI_OVERLOADED = 2,
+    FCGI_UNKNOWN_ROLE = 3
+  };
+
   QFCgiRecord();
   QFCgiRecord(quint8 type, quint16 requestId);
   QFCgiRecord(const QFCgiRecord &other);
+
+  static QFCgiRecord createEndRequest(quint32 requestId, quint32 appStatus, enum ProtocolStatus protocolStatus);
 
   QFCgiRecord& operator = (const QFCgiRecord &other);
 

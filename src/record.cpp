@@ -56,6 +56,24 @@ QFCgiRecord& QFCgiRecord::operator = (const QFCgiRecord &other) {
   return *this;
 }
 
+QFCgiRecord QFCgiRecord::createEndRequest(quint32 requestId, quint32 appStatus, enum ProtocolStatus protocolStatus) {
+  const char reserved[] = { 0, 0, 0 };
+
+  QFCgiRecord record;
+  record.type = 3;
+  record.requestId = requestId;
+
+  record.content
+    .append((appStatus >> 24) & 0xFF)
+    .append((appStatus >> 16) & 0xFF)
+    .append((appStatus >> 8) & 0xFF)
+    .append(appStatus & 0xFF)
+    .append(protocolStatus)
+    .append(reserved, sizeof(reserved));
+
+  return record;
+}
+
 enum QFCgiRecord::Version QFCgiRecord::getVersion() const {
   return this->version;
 }
