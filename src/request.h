@@ -26,12 +26,14 @@ class QFCgiRequest : public QObject {
   Q_OBJECT
 
 public:
-  QFCgiRequest(int id, QFCgiConnection *parent);
+  QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent);
 
   int getId() const;
+  bool keepConnection() const;
 
 private:
   int id;
+  bool keepConn;
 };
 
 #endif  /* QFCGI_REQUEST_H */

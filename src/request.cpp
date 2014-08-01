@@ -18,10 +18,15 @@
 #include "connection.h"
 #include "request.h"
 
-QFCgiRequest::QFCgiRequest(int id, QFCgiConnection *parent) : QObject(parent) {
+QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QObject(parent) {
   this->id = id;
+  this->keepConn = keepConn;
 }
 
 int QFCgiRequest::getId() const {
   return this->id;
+}
+
+bool QFCgiRequest::keepConnection() const {
+  return this->keepConn;
 }

@@ -103,15 +103,16 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   QByteArray &ba = record.getContent();
   quint16 role = ((ba[0] & 0xFF) << 8) | (ba[1] & 0xFF);
   quint8 flags = ba[2];
+  bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
 
   if (role != FCGI_RESPONDER) {
     // send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE
     qCritical() << "send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE";
   }
 
-  QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), this);
+  QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
   this->requests.insert(request->getId(), request);
-  qDebug() << "new FastCGI request [ id:" << request->getId() << ", role:" << role << ", flags:" << flags << "]";
+  qDebug() << "new FastCGI request [ id:" << request->getId() << ", role:" << role << ", keep_conn:" << keep_conn << "]";
 }
 
 void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
