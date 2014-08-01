@@ -31,13 +31,9 @@
 #define FCGI_VERSION_1 1
 
 QFCgiRecord::QFCgiRecord() {
-  QFCgiRecord(0, 0);
-}
-
-QFCgiRecord::QFCgiRecord(quint8 type, quint16 requestId) {
   this->version = QFCgiRecord::V1;
-  this->type = type;
-  this->requestId = requestId;
+  this->type = FCGI_UNKNOWN_TYPE;
+  this->requestId = 0;
 }
 
 QFCgiRecord::QFCgiRecord(const QFCgiRecord &other) {
@@ -60,7 +56,7 @@ QFCgiRecord QFCgiRecord::createEndRequest(quint32 requestId, quint32 appStatus, 
   const char reserved[] = { 0, 0, 0 };
 
   QFCgiRecord record;
-  record.type = 3;
+  record.type = FCGI_END_REQUEST;
   record.requestId = requestId;
 
   record.content
@@ -87,12 +83,20 @@ bool QFCgiRecord::setVersion(quint8 version) {
   }
 }
 
-quint8 QFCgiRecord::getType() const {
+enum QFCgiRecord::Type QFCgiRecord::getType() const {
   return this->type;
 }
 
-void QFCgiRecord::setType(quint8 type) {
+void QFCgiRecord::setType(QFCgiRecord::Type type) {
   this->type = type;
+}
+
+void QFCgiRecord::setType(quint8 type) {
+  if (type > 0 && type <= FCGI_UNKNOWN_TYPE) {
+    this->type = (enum Type)type;
+  } else {
+    this->type = FCGI_UNKNOWN_TYPE;
+  }
 }
 
 quint16 QFCgiRecord::getRequestId() const {
@@ -150,7 +154,7 @@ qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, qui
     return -1;
   }
 
-  this->type = ba[1] & 0xFF;
+  setType(ba[1] & 0xFF);
   this->requestId = (ba[2] & 0xff << 8) | (ba[3] & 0xFF);
 
   *contentLength = (ba[4] & 0xff << 8) | (ba[5] & 0xFF);

@@ -29,6 +29,20 @@ public:
     V1 = 1
   };
 
+  enum Type {
+    FCGI_BEGIN_REQUEST = 1,
+    FCGI_ABORT_REQUEST = 2,
+    FCGI_END_REQUEST = 3,
+    FCGI_PARAMS = 4,
+    FCGI_STDIN = 5,
+    FCGI_STDOUT = 6,
+    FCGI_STDERR = 7,
+    FCGI_DATA = 8,
+    FCGI_GET_VALUES = 9,
+    FCGI_GET_VALUES_RESULT = 10,
+    FCGI_UNKNOWN_TYPE = 11
+  };
+
   enum ProtocolStatus {
     FCGI_REQUEST_COMPLETE = 0,
     FCGI_CANT_MPX_CONN = 1,
@@ -37,7 +51,6 @@ public:
   };
 
   QFCgiRecord();
-  QFCgiRecord(quint8 type, quint16 requestId);
   QFCgiRecord(const QFCgiRecord &other);
 
   static QFCgiRecord createEndRequest(quint32 requestId, quint32 appStatus, enum ProtocolStatus protocolStatus);
@@ -45,8 +58,8 @@ public:
   QFCgiRecord& operator = (const QFCgiRecord &other);
 
   enum Version getVersion() const;
-  quint8 getType() const;
-  void setType(quint8 type);
+  enum Type getType() const;
+  void setType(Type type);
   quint16 getRequestId() const;
   void setRequestId(quint16 requestId);
   QByteArray& getContent();
@@ -56,12 +69,13 @@ public:
 
 private:
   bool setVersion(quint8 version);
+  void setType(quint8 type);
 
   qint32 readHeader(const QByteArray &ba, quint16 *contentLength, quint8 *paddingLength);
   qint32 writeHeader(QIODevice *device, quint8 *paddingLength);
 
   enum Version version;
-  quint8 type;
+  enum Type type;
   quint16 requestId;
   QByteArray content;
 };
