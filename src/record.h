@@ -43,11 +43,13 @@ public:
   QByteArray& getContent();
 
   qint32 read(const QByteArray &ba);
+  qint32 write(QIODevice *device);
 
 private:
   bool setVersion(quint8 version);
 
   qint32 readHeader(const QByteArray &ba, quint16 *contentLength, quint8 *paddingLength);
+  qint32 writeHeader(QIODevice *device, quint8 *paddingLength);
 
   enum Version version;
   quint8 type;

@@ -15,6 +15,8 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QIODevice>
+
 #include "record.h"
 
 /*
@@ -107,6 +109,19 @@ qint32 QFCgiRecord::read(const QByteArray &ba) {
   return nread + contentLength + paddingLength;
 }
 
+qint32 QFCgiRecord::write(QIODevice *device) {
+  quint8 paddingLength;
+  qint32 nwritten;
+
+  nwritten = writeHeader(device, &paddingLength);
+  device->write(this->content);
+
+  QByteArray padding(paddingLength, 0);
+  device->write(padding);
+
+  return nwritten + this->content.size() + paddingLength;
+}
+
 qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, quint8 *paddingLength) {
   if (ba.size() < FCGI_HEADER_LEN) {
     // Not enough data available
@@ -124,6 +139,25 @@ qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, qui
   *paddingLength = ba[6] & 0xFF;
 
   // ba[7] -> reserved-flag
+
+  return FCGI_HEADER_LEN;
+}
+
+qint32 QFCgiRecord::writeHeader(QIODevice *device, quint8 *paddingLength) {
+  int contentLength = this->content.size();
+  int reserved = 0;
+
+  int mod = contentLength % FCGI_HEADER_LEN;
+  *paddingLength = (mod > 0) ? FCGI_HEADER_LEN - mod : 0;
+
+  QByteArray header;
+  header.append(FCGI_VERSION_1)
+    .append(this->type)
+    .append((this->requestId >> 8) & 0xFF).append(this->requestId & 0xFF)
+    .append((contentLength >> 8) & 0xFF).append(contentLength & 0xFF)
+    .append(*paddingLength & 0xFF)
+    .append(reserved);
+  device->write(header);
 
   return FCGI_HEADER_LEN;
 }
