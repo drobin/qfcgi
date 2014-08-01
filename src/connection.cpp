@@ -106,8 +106,11 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
 
   if (role != FCGI_RESPONDER) {
-    // send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE
-    qCritical() << "send back FCGI_END_REQUEST with FCGI_UNKNOWN_ROLE";
+    qCritical() << "new FastCGI request (unsupported role) [ id:" << record.getRequestId() << ", role:" << role << ", keep_conn:" << keep_conn << "]";
+    QFCgiRecord response = QFCgiRecord::createEndRequest(record.getRequestId(), 0, QFCgiRecord::FCGI_UNKNOWN_ROLE);
+    response.write(this->so);
+
+    return;
   }
 
   QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
