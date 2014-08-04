@@ -131,5 +131,7 @@ void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
     request->params->write(ba);
   } else {
     q2Debug(record) << "FCGI_PARAMS (end of stream)";
+    QFCgi *fcgi = qobject_cast<QFCgi*>(parent());
+    emit fcgi->newRequest(request);
   }
 }

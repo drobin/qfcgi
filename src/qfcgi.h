@@ -20,6 +20,7 @@
 
 #include <QObject>
 
+class QFCgiRequest;
 class QTcpServer;
 
 class QFCgi : public QObject {
@@ -29,6 +30,9 @@ public:
   QFCgi(QObject *parent = 0);
   virtual ~QFCgi();
 
+signals:
+  void newRequest(QFCgiRequest *request);
+
 public slots:
   void start();
 
@@ -36,6 +40,8 @@ private slots:
   void onNewConnection();
 
 private:
+  friend class QFCgiConnection;
+
   QTcpServer *server;
 };
 
