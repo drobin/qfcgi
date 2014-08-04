@@ -50,6 +50,10 @@ QFCgiConnection::~QFCgiConnection() {
   delete so;
 }
 
+void QFCgiConnection::send(const QFCgiRecord &record) {
+  record.write(this->so);
+}
+
 void QFCgiConnection::onReadyRead() {
   fillBuffer();
 
@@ -113,7 +117,7 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   if (role != FCGI_RESPONDER) {
     q2Critical(record) << "new FastCGI request (unsupported role) [ role:" << role << ", keep_conn:" << keep_conn << "]";
     QFCgiRecord response = QFCgiRecord::createEndRequest(record.getRequestId(), 0, QFCgiRecord::FCGI_UNKNOWN_ROLE);
-    response.write(this->so);
+    send(response);
 
     return;
   }

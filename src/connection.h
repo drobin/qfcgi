@@ -33,6 +33,8 @@ public:
   QFCgiConnection(QTcpSocket *so, QFCgi *parent);
   ~QFCgiConnection();
 
+  void send(const QFCgiRecord &record);
+
 private slots:
   void onReadyRead();
   void onDisconnected();

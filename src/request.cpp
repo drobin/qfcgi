@@ -19,6 +19,7 @@
 #include <QDebug>
 
 #include "connection.h"
+#include "record.h"
 #include "request.h"
 #include "stream.h"
 
@@ -42,6 +43,13 @@ int QFCgiRequest::getId() const {
 
 bool QFCgiRequest::keepConnection() const {
   return this->keepConn;
+}
+
+void QFCgiRequest::endRequest(quint32 appStatus) {
+  QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
+  QFCgiRecord response = QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_REQUEST_COMPLETE);
+
+  connection->send(response);
 }
 
 QList<QString> QFCgiRequest::getParams() const {

@@ -34,6 +34,8 @@ public:
   int getId() const;
   bool keepConnection() const;
 
+  void endRequest(quint32 appStatus);
+
   QList<QString> getParams() const;
   QString getParam(const QString &name) const;
 

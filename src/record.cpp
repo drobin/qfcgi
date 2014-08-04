@@ -132,7 +132,7 @@ qint32 QFCgiRecord::read(const QByteArray &ba) {
   return nread + contentLength + paddingLength;
 }
 
-qint32 QFCgiRecord::write(QIODevice *device) {
+qint32 QFCgiRecord::write(QIODevice *device) const {
   quint8 paddingLength;
   qint32 nwritten;
 
@@ -166,7 +166,7 @@ qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, qui
   return FCGI_HEADER_LEN;
 }
 
-qint32 QFCgiRecord::writeHeader(QIODevice *device, quint8 *paddingLength) {
+qint32 QFCgiRecord::writeHeader(QIODevice *device, quint8 *paddingLength) const {
   int contentLength = this->content.size();
   int reserved = 0;
 
