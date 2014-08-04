@@ -42,6 +42,7 @@ QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent
   this->so = so;
 
   connect(this->so, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+  connect(this->so, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 }
 
 QFCgiConnection::~QFCgiConnection() {
@@ -67,6 +68,11 @@ void QFCgiConnection::onReadyRead() {
     qCritical() << "failed to read record";
     deleteLater();
   }
+}
+
+void QFCgiConnection::onDisconnected() {
+  qDebug() << "FastCGI connection closed";
+  deleteLater();
 }
 
 void QFCgiConnection::fillBuffer() {

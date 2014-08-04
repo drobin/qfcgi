@@ -35,6 +35,7 @@ public:
 
 private slots:
   void onReadyRead();
+  void onDisconnected();
 
 private:
   void fillBuffer();
