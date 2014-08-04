@@ -22,6 +22,7 @@
 #include "qfcgi.h"
 #include "record.h"
 #include "request.h"
+#include "stream.h"
 
 #define q2Debug(record) qDebug() << "[" << record.getRequestId() << "]"
 #define q2Critical(record) qCritical() << "[" << record.getRequestId() << "]"
@@ -98,6 +99,7 @@ void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
   switch (record.getType()) {
     case QFCgiRecord::FCGI_BEGIN_REQUEST: handleFCGI_BEGIN_REQUEST(record); break;
     case QFCgiRecord::FCGI_PARAMS: handleFCGI_PARAMS(record); break;
+    case QFCgiRecord::FCGI_STDIN: handleFCGI_STDIN(record); break;
     default: q2Critical(record) << "invalid record of type" << record.getType();
   }
 }
@@ -139,5 +141,25 @@ void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
     q2Debug(record) << "FCGI_PARAMS (end of stream)";
     QFCgi *fcgi = qobject_cast<QFCgi*>(parent());
     emit fcgi->newRequest(request);
+  }
+}
+
+void QFCgiConnection::handleFCGI_STDIN(QFCgiRecord &record) {
+  QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
+
+  if (request == 0) {
+    q2Critical(record) << "no such request";
+    deleteLater();
+    return;
+  }
+
+  QByteArray &ba = record.getContent();
+
+  if (!ba.isEmpty()) {
+    q2Debug(record) << "FCGI_STDIN";
+    request->in->append(ba);
+  } else {
+    q2Debug(record) << "FCGI_STDIN (end of stream)";
+    request->in->setEof();
   }
 }

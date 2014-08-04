@@ -20,6 +20,7 @@
 
 #include "connection.h"
 #include "request.h"
+#include "stream.h"
 
 #define q2Debug() qDebug() << "[" << this->id << "]"
 
@@ -27,8 +28,10 @@ QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QOb
   this->id = id;
   this->keepConn = keepConn;
   this->paramsBuffer = new QBuffer(this);
+  this->in = new QFCgiStream(this);
 
   this->paramsBuffer->open(QBuffer::ReadWrite);
+  this->in->open(QIODevice::ReadOnly);
 
   connect(this->paramsBuffer, SIGNAL(readyRead()), this, SLOT(onParamsReadyRead()));
 }
@@ -47,6 +50,10 @@ QList<QString> QFCgiRequest::getParams() const {
 
 QString QFCgiRequest::getParam(const QString &name) const {
   return this->params.value(name);
+}
+
+QIODevice* QFCgiRequest::getIn() {
+  return this->in;
 }
 
 void QFCgiRequest::onParamsReadyRead() {

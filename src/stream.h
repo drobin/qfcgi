@@ -27,14 +27,20 @@ public:
   QFCgiStream(QObject *parent = 0);
   virtual ~QFCgiStream();
 
+  bool atEnd() const;
+  qint64 bytesAvailable() const;
+  bool isSequential() const;
+
   void append(const QByteArray &ba);
+  void setEof();
 
 protected:
   qint64 readData(char *data, qint64 maxSize);
   qint64 writeData(const char *data, qint64 maxSize);
 
 private:
-  QByteArray array;
+  QByteArray buffer;
+  bool eof;
 };
 
 #endif  /* QFCGI_STREAM_H */

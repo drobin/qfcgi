@@ -43,6 +43,7 @@ private:
   void handleApplicationRecord(QFCgiRecord &record);
   void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
   void handleFCGI_PARAMS(QFCgiRecord &record);
+  void handleFCGI_STDIN(QFCgiRecord &record);
 
   QTcpSocket *so;
   QByteArray buf;

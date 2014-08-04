@@ -18,28 +18,60 @@
 #include "stream.h"
 
 QFCgiStream::QFCgiStream(QObject *parent) : QIODevice(parent) {
+  this->eof = false;
 }
 
 QFCgiStream::~QFCgiStream() {
 }
 
+bool QFCgiStream::atEnd() const {
+  return this->eof && this->buffer.isEmpty();
+}
+
+qint64 QFCgiStream::bytesAvailable() const {
+  return this->buffer.size() + QIODevice::bytesAvailable();
+}
+
+bool QFCgiStream::isSequential() const {
+  return true;
+}
+
 void QFCgiStream::append(const QByteArray &ba) {
-  this->array.append(ba);
-  emit readyRead();
+  if ((openMode() & QIODevice::ReadOnly) > 0) {
+    this->buffer.append(ba);
+    emit readyRead();
+  }
+}
+
+void QFCgiStream::setEof() {
+  if (!this->eof) {
+    this->eof = true;
+    emit readChannelFinished();
+  }
 }
 
 qint64 QFCgiStream::readData(char *data, qint64 maxSize) {
-  if (this->array.isEmpty()) {
+  if ((openMode() & QIODevice::ReadOnly) == 0) {
     return -1;
   }
 
-  qint64 nbytes = qMin(this->array.size(), (int)maxSize);
-  memcpy(data, this->array.data(), nbytes);
+  if (this->buffer.isEmpty()) {
+    return this->eof ? -1 : 0;
+  }
+
+  qint64 nbytes = qMin(this->buffer.size(), (int)maxSize);
+  memcpy(data, this->buffer.data(), nbytes);
 
   return nbytes;
 }
 
 qint64 QFCgiStream::writeData(const char *data, qint64 maxSize) {
-  this->array.append(data, maxSize);
+  if ((openMode() & QIODevice::WriteOnly) == 0) {
+    return -1;
+  }
+
+  this->buffer.append(data, maxSize);
+  emit bytesWritten(maxSize);
+
   return maxSize;
 }

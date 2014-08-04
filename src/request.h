@@ -23,6 +23,7 @@
 
 class QBuffer;
 class QFCgiConnection;
+class QFCgiStream;
 
 class QFCgiRequest : public QObject {
   Q_OBJECT
@@ -35,6 +36,8 @@ public:
 
   QList<QString> getParams() const;
   QString getParam(const QString &name) const;
+
+  QIODevice* getIn();
 
 private slots:
   void onParamsReadyRead();
@@ -49,6 +52,7 @@ private:
   int id;
   bool keepConn;
   QBuffer *paramsBuffer;
+  QFCgiStream *in;
   QHash<QString, QString> params;
 };
 
