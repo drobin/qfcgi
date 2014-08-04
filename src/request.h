@@ -18,6 +18,7 @@
 #ifndef QFCGI_REQUEST_H
 #define QFCGI_REQUEST_H
 
+#include <QHash>
 #include <QObject>
 
 class QBuffer;
@@ -32,12 +33,23 @@ public:
   int getId() const;
   bool keepConnection() const;
 
+  QList<QString> getParams() const;
+  QString getParam(const QString &name) const;
+
+private slots:
+  void onParamsReadyRead();
+
 private:
   friend class QFCgiConnection;
 
+  qint32 readNameValuePair(QString &name, QString &value);
+  qint32 readLengthField(int pos, quint32 *length);
+  qint32 readValueField(int pos, quint32 length, QString &value);
+
   int id;
   bool keepConn;
-  QBuffer *params;
+  QBuffer *paramsBuffer;
+  QHash<QString, QString> params;
 };
 
 #endif  /* QFCGI_REQUEST_H */
