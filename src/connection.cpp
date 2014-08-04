@@ -58,6 +58,11 @@ void QFCgiConnection::onReadyRead() {
       default: handleApplicationRecord(record); break;
     }
   }
+
+  if (nconsumed < 0) {
+    qCritical() << "failed to read record";
+    deleteLater();
+  }
 }
 
 void QFCgiConnection::fillBuffer() {

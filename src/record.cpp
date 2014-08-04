@@ -15,6 +15,7 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
 #include <QIODevice>
 
 #include "record.h"
@@ -155,9 +156,9 @@ qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, qui
   }
 
   setType(ba[1] & 0xFF);
-  this->requestId = (ba[2] & 0xff << 8) | (ba[3] & 0xFF);
+  this->requestId = ((ba[2] & 0xFF) << 8) | (ba[3] & 0xFF);
 
-  *contentLength = (ba[4] & 0xff << 8) | (ba[5] & 0xFF);
+  *contentLength = ((ba[4] & 0xFF) << 8) | (ba[5] & 0xFF);
   *paddingLength = ba[6] & 0xFF;
 
   // ba[7] -> reserved-flag
