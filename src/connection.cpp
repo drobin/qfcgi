@@ -15,12 +15,16 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QBuffer>
 #include <QTcpSocket>
 
 #include "connection.h"
 #include "qfcgi.h"
 #include "record.h"
 #include "request.h"
+
+#define q2Debug(record) qDebug() << "[" << record.getRequestId() << "]"
+#define q2Critical(record) qCritical() << "[" << record.getRequestId() << "]"
 
 /*
  * Values for role component of FCGI_BeginRequestBody
@@ -88,6 +92,7 @@ void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
   switch (record.getType()) {
     case QFCgiRecord::FCGI_BEGIN_REQUEST: handleFCGI_BEGIN_REQUEST(record); break;
     case QFCgiRecord::FCGI_PARAMS: handleFCGI_PARAMS(record); break;
+    default: q2Critical(record) << "invalid record of type" << record.getType();
   }
 }
 
@@ -98,7 +103,7 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
 
   if (role != FCGI_RESPONDER) {
-    qCritical() << "new FastCGI request (unsupported role) [ id:" << record.getRequestId() << ", role:" << role << ", keep_conn:" << keep_conn << "]";
+    q2Critical(record) << "new FastCGI request (unsupported role) [ role:" << role << ", keep_conn:" << keep_conn << "]";
     QFCgiRecord response = QFCgiRecord::createEndRequest(record.getRequestId(), 0, QFCgiRecord::FCGI_UNKNOWN_ROLE);
     response.write(this->so);
 
@@ -107,17 +112,24 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
 
   QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
   this->requests.insert(request->getId(), request);
-  qDebug() << "new FastCGI request [ id:" << request->getId() << ", role:" << role << ", keep_conn:" << keep_conn << "]";
+  q2Debug(record) << "new FastCGI request [ role:" << role << ", keep_conn:" << keep_conn << "]";
 }
 
 void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
   QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
 
   if (request == 0) {
-    qCritical() << "could not find request with id" << record.getRequestId();
+    q2Critical(record) << "no such request";
     deleteLater();
     return;
   }
 
-  qDebug() << "[" << request->getId() << "]: FCGI_PARAMS";
+  QByteArray &ba = record.getContent();
+
+  if (!ba.isEmpty()) {
+    q2Debug(record) << "FCGI_PARAMS";
+    request->params->write(ba);
+  } else {
+    q2Debug(record) << "FCGI_PARAMS (end of stream)";
+  }
 }

@@ -15,12 +15,15 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QBuffer>
+
 #include "connection.h"
 #include "request.h"
 
 QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QObject(parent) {
   this->id = id;
   this->keepConn = keepConn;
+  this->params = new QBuffer(this);
 }
 
 int QFCgiRequest::getId() const {

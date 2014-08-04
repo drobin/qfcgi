@@ -20,6 +20,7 @@
 
 #include <QObject>
 
+class QBuffer;
 class QFCgiConnection;
 
 class QFCgiRequest : public QObject {
@@ -32,8 +33,11 @@ public:
   bool keepConnection() const;
 
 private:
+  friend class QFCgiConnection;
+
   int id;
   bool keepConn;
+  QBuffer *params;
 };
 
 #endif  /* QFCGI_REQUEST_H */
