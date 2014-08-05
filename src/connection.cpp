@@ -24,8 +24,10 @@
 #include "record.h"
 #include "stream.h"
 
-#define q2Debug(record) qDebug() << "[" << record.getRequestId() << "]"
-#define q2Critical(record) qCritical() << "[" << record.getRequestId() << "]"
+#define q1Debug() qDebug() << "[" << this->id << "]"
+#define q1Critical() qCritical() << "[" << this->id << "]"
+#define q2Debug(record) qDebug() << "[" << this->id << "," << record.getRequestId() << "]"
+#define q2Critical(record) qCritical() << "[" << this->id << "," << record.getRequestId() << "]"
 
 /*
  * Values for role component of FCGI_BeginRequestBody
@@ -82,13 +84,13 @@ void QFCgiConnection::onReadyRead() {
   }
 
   if (nconsumed < 0) {
-    qCritical() << "failed to read record";
+    q1Critical() << "failed to read record";
     deleteLater();
   }
 }
 
 void QFCgiConnection::onDisconnected() {
-  qDebug() << "FastCGI connection closed";
+  q1Debug() << "FastCGI connection closed";
   deleteLater();
 }
 
@@ -99,16 +101,16 @@ void QFCgiConnection::fillBuffer() {
   qint64 nread = this->so->read(buf, avail);
 
   if (nread >= 0) {
-    qDebug() << nread << "bytes read from socket";
+    q1Debug() << nread << "bytes read from socket";
     this->buf.append(buf, nread);
   } else {
-    qCritical() << this->so->errorString();
+    q1Critical() << this->so->errorString();
     deleteLater();
   }
 }
 
 void QFCgiConnection::handleManagementRecord(QFCgiRecord &record) {
-  qDebug() << "management record read" << record.getType() << record.getRequestId();
+  q1Debug() << "management record read" << record.getType() << record.getRequestId();
 }
 
 void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
