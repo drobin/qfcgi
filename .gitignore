@@ -1,4 +1,5 @@
 Makefile
+doc/
 *.a
 *.o
 moc_*.cpp

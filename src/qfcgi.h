@@ -23,17 +23,42 @@
 class QFCgiRequest;
 class QTcpServer;
 
+/**
+ * FastCGI support for Qt.
+ *
+ * This class is the entry point for the library. The library uses the Qt event
+ * mechanismn to dispatch its data. To start the FastCGI application server
+ * call the #start() method.
+ *
+ * For reach request received from the web server the #newRequest() signal is emitted.
+ */
 class QFCgi : public QObject {
   Q_OBJECT
 
 public:
+  /**
+   * Creates a new instance of the class.
+   */
   QFCgi(QObject *parent = 0);
   virtual ~QFCgi();
 
 signals:
+  /**
+   * This signal is emitted when a new request was received from the web server.
+   *
+   * The library takes over the ownership of the request-object, thus don't
+   * destroy the object by yourself.
+   *
+   * @param request The new request
+   */
   void newRequest(QFCgiRequest *request);
 
 public slots:
+  /**
+   * Starts the FastCGI application server.
+   *
+   * You need to call this method to setup the server.
+   */
   void start();
 
 private slots:
