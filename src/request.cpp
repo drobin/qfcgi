@@ -17,6 +17,7 @@
 
 #include <QBuffer>
 #include <QDebug>
+#include <QtGlobal>
 
 #include "connection.h"
 #include "record.h"
@@ -30,11 +31,16 @@ QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QOb
   this->keepConn = keepConn;
   this->paramsBuffer = new QBuffer(this);
   this->in = new QFCgiStream(this);
+  this->out = new QFCgiStream(this);
+  this->err = new QFCgiStream(this);
 
   this->paramsBuffer->open(QBuffer::ReadWrite);
   this->in->open(QIODevice::ReadOnly);
+  this->out->open(QIODevice::WriteOnly);
+  this->err->open(QIODevice::WriteOnly);
 
   connect(this->paramsBuffer, SIGNAL(readyRead()), this, SLOT(onParamsReadyRead()));
+  connect(this->out, SIGNAL(bytesWritten(qint64)), this, SLOT(onOutBytesWritten(qint64)));
 }
 
 int QFCgiRequest::getId() const {
@@ -47,9 +53,16 @@ bool QFCgiRequest::keepConnection() const {
 
 void QFCgiRequest::endRequest(quint32 appStatus) {
   QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
-  QFCgiRecord response = QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_REQUEST_COMPLETE);
 
-  connection->send(response);
+  connection->send(QFCgiRecord::createOutStream(this->id, QByteArray()));
+  connection->send(QFCgiRecord::createErrStream(this->id, QByteArray()));
+  connection->send(QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_CANT_MPX_CONN));
+
+  if (!keepConnection()) {
+    q2Debug() << "endRequest - abount to close connection";
+    QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
+    connection->closeConnection();
+  }
 }
 
 QList<QString> QFCgiRequest::getParams() const {
@@ -60,8 +73,16 @@ QString QFCgiRequest::getParam(const QString &name) const {
   return this->params.value(name);
 }
 
-QIODevice* QFCgiRequest::getIn() {
+QIODevice* QFCgiRequest::getIn() const {
   return this->in;
+}
+
+QIODevice* QFCgiRequest::getOut() const {
+  return this->out;
+}
+
+QIODevice* QFCgiRequest::getErr() const {
+  return this->err;
 }
 
 void QFCgiRequest::onParamsReadyRead() {
@@ -73,6 +94,17 @@ void QFCgiRequest::onParamsReadyRead() {
     this->paramsBuffer->buffer().remove(0, nread);
     this->params.insert(name, value);
   }
+}
+
+void QFCgiRequest::onOutBytesWritten(qint64 bytes __unused) {
+  QByteArray &ba = this->out->getBuffer();
+  int nbytes = qMin(65535, ba.size());
+
+  QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
+  QFCgiRecord record = QFCgiRecord::createOutStream(this->id, ba.left(nbytes));
+
+  ba.remove(0, nbytes);
+  connection->send(record);
 }
 
 qint32 QFCgiRequest::readNameValuePair(QString &name, QString &value) {

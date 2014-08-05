@@ -39,10 +39,13 @@ public:
   QList<QString> getParams() const;
   QString getParam(const QString &name) const;
 
-  QIODevice* getIn();
+  QIODevice* getIn() const;
+  QIODevice* getOut() const;
+  QIODevice* getErr() const;
 
 private slots:
   void onParamsReadyRead();
+  void onOutBytesWritten(qint64 bytes);
 
 private:
   friend class QFCgiConnection;
@@ -55,6 +58,8 @@ private:
   bool keepConn;
   QBuffer *paramsBuffer;
   QFCgiStream *in;
+  QFCgiStream *out;
+  QFCgiStream *err;
   QHash<QString, QString> params;
 };
 
