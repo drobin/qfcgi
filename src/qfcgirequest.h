@@ -28,8 +28,6 @@ class QFCgiRequest : public QObject {
   Q_OBJECT
 
 public:
-  QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent);
-
   int getId() const;
   bool keepConnection() const;
 
@@ -48,6 +46,9 @@ private slots:
 
 private:
   friend class QFCgiConnection;
+
+  QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent);
+  ~QFCgiRequest() {}
 
   void consumeParamsBuffer(const QByteArray &data);
   qint32 readNameValuePair(QString &name, QString &value);
