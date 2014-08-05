@@ -34,6 +34,7 @@ public:
   ~QFCgiConnection();
 
   void send(const QFCgiRecord &record);
+  void closeConnection();
 
 private slots:
   void onReadyRead();

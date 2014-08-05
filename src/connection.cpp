@@ -51,7 +51,12 @@ QFCgiConnection::~QFCgiConnection() {
 }
 
 void QFCgiConnection::send(const QFCgiRecord &record) {
+  q2Debug(record) << "sending record [ type:" << record.getType() << ", content-length:" << record.getContent().size() << "]";
   record.write(this->so);
+}
+
+void QFCgiConnection::closeConnection() {
+  this->so->disconnectFromHost();
 }
 
 void QFCgiConnection::onReadyRead() {
@@ -109,7 +114,7 @@ void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
 }
 
 void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
-  QByteArray &ba = record.getContent();
+  const QByteArray &ba = record.getContent();
   quint16 role = ((ba[0] & 0xFF) << 8) | (ba[1] & 0xFF);
   quint8 flags = ba[2];
   bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
@@ -136,7 +141,7 @@ void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
     return;
   }
 
-  QByteArray &ba = record.getContent();
+  const QByteArray &ba = record.getContent();
 
   if (!ba.isEmpty()) {
     q2Debug(record) << "FCGI_PARAMS";
@@ -157,7 +162,7 @@ void QFCgiConnection::handleFCGI_STDIN(QFCgiRecord &record) {
     return;
   }
 
-  QByteArray &ba = record.getContent();
+  const QByteArray &ba = record.getContent();
 
   if (!ba.isEmpty()) {
     q2Debug(record) << "FCGI_STDIN";
