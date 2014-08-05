@@ -36,6 +36,10 @@ bool QFCgiStream::isSequential() const {
   return true;
 }
 
+QByteArray& QFCgiStream::getBuffer() {
+  return this->buffer;
+}
+
 void QFCgiStream::append(const QByteArray &ba) {
   if ((openMode() & QIODevice::ReadOnly) > 0) {
     this->buffer.append(ba);

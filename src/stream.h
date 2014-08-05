@@ -31,6 +31,7 @@ public:
   qint64 bytesAvailable() const;
   bool isSequential() const;
 
+  QByteArray& getBuffer();
   void append(const QByteArray &ba);
   void setEof();
 
