@@ -23,13 +23,13 @@ CONFIG   += staticlib debug warn_on
 SOURCES = \
   connection.cpp \
   qfcgi.cpp \
+  qfcgirequest.cpp \
   record.cpp \
-  request.cpp \
   stream.cpp
 
 HEADERS += \
   connection.h \
   qfcgi.h \
+  qfcgirequest.h \
   record.h \
-  request.h \
   stream.h

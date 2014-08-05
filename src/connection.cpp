@@ -20,8 +20,8 @@
 
 #include "connection.h"
 #include "qfcgi.h"
+#include "qfcgirequest.h"
 #include "record.h"
-#include "request.h"
 #include "stream.h"
 
 #define q2Debug(record) qDebug() << "[" << record.getRequestId() << "]"
