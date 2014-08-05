@@ -21,7 +21,6 @@
 #include <QHash>
 #include <QObject>
 
-class QBuffer;
 class QFCgiConnection;
 class QFCgiStream;
 
@@ -44,19 +43,19 @@ public:
   QIODevice* getErr() const;
 
 private slots:
-  void onParamsReadyRead();
   void onOutBytesWritten(qint64 bytes);
 
 private:
   friend class QFCgiConnection;
 
+  void consumeParamsBuffer(const QByteArray &data);
   qint32 readNameValuePair(QString &name, QString &value);
   qint32 readLengthField(int pos, quint32 *length);
   qint32 readValueField(int pos, quint32 length, QString &value);
 
   int id;
   bool keepConn;
-  QBuffer *paramsBuffer;
+  QByteArray paramsBuffer;
   QFCgiStream *in;
   QFCgiStream *out;
   QFCgiStream *err;

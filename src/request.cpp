@@ -29,17 +29,14 @@
 QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QObject(parent) {
   this->id = id;
   this->keepConn = keepConn;
-  this->paramsBuffer = new QBuffer(this);
   this->in = new QFCgiStream(this);
   this->out = new QFCgiStream(this);
   this->err = new QFCgiStream(this);
 
-  this->paramsBuffer->open(QBuffer::ReadWrite);
   this->in->open(QIODevice::ReadOnly);
   this->out->open(QIODevice::WriteOnly);
   this->err->open(QIODevice::WriteOnly);
 
-  connect(this->paramsBuffer, SIGNAL(readyRead()), this, SLOT(onParamsReadyRead()));
   connect(this->out, SIGNAL(bytesWritten(qint64)), this, SLOT(onOutBytesWritten(qint64)));
 }
 
@@ -85,17 +82,6 @@ QIODevice* QFCgiRequest::getErr() const {
   return this->err;
 }
 
-void QFCgiRequest::onParamsReadyRead() {
-  qint32 nread;
-  QString name, value;
-
-  while ((nread = readNameValuePair(name, value)) > 0) {
-    q2Debug() << "param(" << name << ") =" << value;
-    this->paramsBuffer->buffer().remove(0, nread);
-    this->params.insert(name, value);
-  }
-}
-
 void QFCgiRequest::onOutBytesWritten(qint64 bytes __unused) {
   QByteArray &ba = this->out->getBuffer();
   int nbytes = qMin(65535, ba.size());
@@ -105,6 +91,19 @@ void QFCgiRequest::onOutBytesWritten(qint64 bytes __unused) {
 
   ba.remove(0, nbytes);
   connection->send(record);
+}
+
+void QFCgiRequest::consumeParamsBuffer(const QByteArray &data) {
+  qint32 nread;
+  QString name, value;
+
+  this->paramsBuffer.append(data);
+
+  while ((nread = readNameValuePair(name, value)) > 0) {
+    q2Debug() << "param(" << name << ") =" << value;
+    this->paramsBuffer.remove(0, nread);
+    this->params.insert(name, value);
+  }
 }
 
 qint32 QFCgiRequest::readNameValuePair(QString &name, QString &value) {
@@ -131,7 +130,7 @@ qint32 QFCgiRequest::readNameValuePair(QString &name, QString &value) {
 }
 
 qint32 QFCgiRequest::readLengthField(int pos, quint32 *length) {
-  QByteArray ba = this->paramsBuffer->buffer().mid(pos);
+  QByteArray ba = this->paramsBuffer.mid(pos);
 
   if (ba.isEmpty()) {
     return 0;
@@ -156,7 +155,7 @@ qint32 QFCgiRequest::readLengthField(int pos, quint32 *length) {
 }
 
 qint32 QFCgiRequest::readValueField(int pos, quint32 length, QString &value) {
-  QByteArray ba = this->paramsBuffer->buffer().mid(pos);
+  QByteArray ba = this->paramsBuffer.mid(pos);
 
   if (ba.size() >= (int)length) {
     value = ba.left(length);
