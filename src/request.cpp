@@ -38,6 +38,7 @@ QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QOb
   this->err->open(QIODevice::WriteOnly);
 
   connect(this->out, SIGNAL(bytesWritten(qint64)), this, SLOT(onOutBytesWritten(qint64)));
+  connect(this->err, SIGNAL(bytesWritten(qint64)), this, SLOT(onErrBytesWritten(qint64)));
 }
 
 int QFCgiRequest::getId() const {
@@ -56,7 +57,7 @@ void QFCgiRequest::endRequest(quint32 appStatus) {
   connection->send(QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_CANT_MPX_CONN));
 
   if (!keepConnection()) {
-    q2Debug() << "endRequest - abount to close connection";
+    q2Debug() << "endRequest - about to close connection";
     QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
     connection->closeConnection();
   }
@@ -88,6 +89,17 @@ void QFCgiRequest::onOutBytesWritten(qint64 bytes __unused) {
 
   QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
   QFCgiRecord record = QFCgiRecord::createOutStream(this->id, ba.left(nbytes));
+
+  ba.remove(0, nbytes);
+  connection->send(record);
+}
+
+void QFCgiRequest::onErrBytesWritten(qint64 bytes __unused) {
+  QByteArray &ba = this->err->getBuffer();
+  int nbytes = qMin(65535, ba.size());
+
+  QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
+  QFCgiRecord record = QFCgiRecord::createErrStream(this->id, ba.left(nbytes));
 
   ba.remove(0, nbytes);
   connection->send(record);

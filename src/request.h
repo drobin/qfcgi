@@ -44,6 +44,7 @@ public:
 
 private slots:
   void onOutBytesWritten(qint64 bytes);
+  void onErrBytesWritten(qint64 bytes);
 
 private:
   friend class QFCgiConnection;
