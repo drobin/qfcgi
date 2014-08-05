@@ -54,6 +54,9 @@ public:
   QFCgiRecord(const QFCgiRecord &other);
 
   static QFCgiRecord createEndRequest(quint32 requestId, quint32 appStatus, enum ProtocolStatus protocolStatus);
+  static QFCgiRecord createOutStream(quint32 requestId, const QByteArray &data);
+  static QFCgiRecord createErrStream(quint32 requestId, const QByteArray &data);
+  static QFCgiRecord createDataStream(quint32 requestId, const QByteArray &data);
 
   QFCgiRecord& operator = (const QFCgiRecord &other);
 
@@ -62,7 +65,7 @@ public:
   void setType(Type type);
   quint16 getRequestId() const;
   void setRequestId(quint16 requestId);
-  QByteArray& getContent();
+  const QByteArray& getContent() const;
 
   qint32 read(const QByteArray &ba);
   qint32 write(QIODevice *device) const;

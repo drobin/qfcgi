@@ -71,6 +71,36 @@ QFCgiRecord QFCgiRecord::createEndRequest(quint32 requestId, quint32 appStatus, 
   return record;
 }
 
+QFCgiRecord QFCgiRecord::createOutStream(quint32 requestId, const QByteArray &data) {
+  QFCgiRecord record;
+
+  record.type = FCGI_STDOUT;
+  record.requestId = requestId;
+  record.content = data;
+
+  return record;
+}
+
+QFCgiRecord QFCgiRecord::createErrStream(quint32 requestId, const QByteArray &data) {
+  QFCgiRecord record;
+
+  record.type = FCGI_STDERR;
+  record.requestId = requestId;
+  record.content = data;
+
+  return record;
+}
+
+QFCgiRecord QFCgiRecord::createDataStream(quint32 requestId, const QByteArray &data) {
+  QFCgiRecord record;
+
+  record.type = FCGI_DATA;
+  record.requestId = requestId;
+  record.content = data;
+
+  return record;
+}
+
 enum QFCgiRecord::Version QFCgiRecord::getVersion() const {
   return this->version;
 }
@@ -108,7 +138,7 @@ void QFCgiRecord::setRequestId(quint16 requestId) {
   this->requestId = requestId;
 }
 
-QByteArray& QFCgiRecord::getContent() {
+const QByteArray& QFCgiRecord::getContent() const {
   return this->content;
 }
 
