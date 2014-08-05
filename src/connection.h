@@ -33,6 +33,8 @@ public:
   QFCgiConnection(QTcpSocket *so, QFCgi *parent);
   ~QFCgiConnection();
 
+  int getId() const;
+
   void send(const QFCgiRecord &record);
   void closeConnection();
 
@@ -48,6 +50,7 @@ private:
   void handleFCGI_PARAMS(QFCgiRecord &record);
   void handleFCGI_STDIN(QFCgiRecord &record);
 
+  int id;
   QTcpSocket *so;
   QByteArray buf;
   QHash<int, QFCgiRequest*> requests;

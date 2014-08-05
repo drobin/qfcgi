@@ -39,7 +39,10 @@
  */
 #define FCGI_KEEP_CONN  1
 
+static int nextConnectionId = 0;
+
 QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent) {
+  this->id = ++nextConnectionId;
   this->so = so;
 
   connect(this->so, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
@@ -48,6 +51,10 @@ QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent
 
 QFCgiConnection::~QFCgiConnection() {
   delete so;
+}
+
+int QFCgiConnection::getId() const {
+  return this->id;
 }
 
 void QFCgiConnection::send(const QFCgiRecord &record) {
