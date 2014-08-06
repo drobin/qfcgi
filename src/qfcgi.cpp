@@ -22,19 +22,44 @@
 #include "qfcgi.h"
 
 QFCgi::QFCgi(QObject *parent) : QObject(parent) {
-  this->server = new QTcpServer(this);
+  this->server = 0;
+  this->listenAddress = QHostAddress::Any;
+  this->listenPort = 9000;
 }
 
 QFCgi::~QFCgi() {
 
 }
 
+void QFCgi::configureListen(const QHostAddress &address, quint16 port) {
+  this->listenAddress = address;
+  this->listenPort = port;
+}
+
+bool QFCgi::isStarted() const {
+  return (this->server != 0) && this->server->isListening();
+}
+
+QString QFCgi::errorString() const {
+  if (this->server != 0) {
+    return this->server->errorString();
+  } else {
+    return "not started";
+  }
+}
+
 void QFCgi::start() {
-  this->server->listen(QHostAddress::Any, 9000);
+  this->server = new QTcpServer(this);
 
-  connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-
-  qDebug() << "FastCGI application started";
+  if (this->server->listen(this->listenAddress, this->listenPort)) {
+    connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+    qDebug() << "FastCGI application started, listening on"
+             << this->server->serverAddress().toString()
+             << "/"
+             << this->server->serverPort();
+  } else {
+    qCritical() << "failed to start FastCGI application:" << this->server->errorString();
+  }
 }
 
 void QFCgi::onNewConnection() {

@@ -18,9 +18,11 @@
 #ifndef QFCGI_H
 #define QFCGI_H
 
+#include <QHostAddress>
 #include <QObject>
 
 class QFCgiRequest;
+class QHostAddress;
 class QTcpServer;
 
 /**
@@ -30,7 +32,12 @@ class QTcpServer;
  * mechanismn to dispatch its data. To start the FastCGI application server
  * call the #start() method.
  *
- * For reach request received from the web server the #newRequest() signal is emitted.
+ * Before the application server can be started, you need to configure it with
+ * the #configureListen() method. By default the server is listening on
+ * <code>anyhost (0.0.0.0)</code> and port <code>9000</code>.
+ *
+ * For reach request received from the web server the #newRequest() signal is
+ * emitted.
  */
 class QFCgi : public QObject {
   Q_OBJECT
@@ -41,6 +48,40 @@ public:
    */
   QFCgi(QObject *parent = 0);
   virtual ~QFCgi();
+
+  /**
+   * Configures the FastCGI application server for listening on the given
+   * address and port.
+   *
+   * After a #start() invocation the application server accepts TCP connections
+   * on the adress/port combination.
+   *
+   * @param address IP address
+   * @param port Port number
+   */
+  void configureListen(const QHostAddress &address, quint16 port);
+
+  /**
+   * Tests whether the #start() operation was successful.
+   *
+   * If succeeded, the FastCGI application server is waiting for incoming
+   * connections. If <code>false</code> is returned, then either #start() was
+   * not called or the application server listen information are not configured
+   * properly. Check one of the <code>configureListen</code> methods. You can
+   * call #errorString() to receive a meaningful error message.
+   *
+   * @return If <code>true</code> is returned, the application server is ready
+   *         and waiting for incoming connections.
+   */
+  bool isStarted() const;
+
+  /**
+   * In case of an startup error, this method returns a (more) meaningful error
+   * message.
+   *
+   * @return Error message that describes the error in detail.
+   */
+  QString errorString() const;
 
 signals:
   /**
@@ -57,7 +98,8 @@ public slots:
   /**
    * Starts the FastCGI application server.
    *
-   * You need to call this method to setup the server.
+   * You need to call this method to setup the server. To test whether the
+   * start-operation was successful, call #isStarted().
    */
   void start();
 
@@ -68,6 +110,8 @@ private:
   friend class QFCgiConnection;
 
   QTcpServer *server;
+  QHostAddress listenAddress;
+  quint16 listenPort;
 };
 
 #endif  /* QFCGI_H */
