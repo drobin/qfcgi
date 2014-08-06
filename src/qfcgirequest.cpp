@@ -54,11 +54,10 @@ void QFCgiRequest::endRequest(quint32 appStatus) {
 
   connection->send(QFCgiRecord::createOutStream(this->id, QByteArray()));
   connection->send(QFCgiRecord::createErrStream(this->id, QByteArray()));
-  connection->send(QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_CANT_MPX_CONN));
+  connection->send(QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_REQUEST_COMPLETE));
 
   if (!keepConnection()) {
     q2Debug() << "endRequest - about to close connection";
-    QFCgiConnection *connection = qobject_cast<QFCgiConnection*>(parent());
     connection->closeConnection();
   }
 }
