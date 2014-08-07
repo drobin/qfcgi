@@ -44,6 +44,17 @@ class QFCgi : public QObject {
 
 public:
   /**
+   * File descriptor where the FastCGI application server can accept
+   * connections.
+   */
+  enum FileDescriptor {
+    /**
+     *  Accept connections on <code>stdin</code>.
+     */
+    FCGI_LISTENSOCK_FILENO = 0
+  };
+
+  /**
    * Creates a new instance of the class.
    */
   QFCgi(QObject *parent = 0);
@@ -68,6 +79,24 @@ public:
    * @param path The path to the UNIX domain socket
    */
   void configureListen(const QString &path);
+
+  /**
+   * Configures the FastCGI application server for listening on the given
+   * file descriptor.
+   *
+   * According the the FastCGI specification the application server can
+   * accept incoming connections on #FCGI_LISTENSOCK_FILENO which equals to
+   * <code>stdin</code>. This mode is used, when the web server forks the
+   * application server process, where the web server binds the socket used for
+   * communication with the application server and maps the socket to
+   * <code>stdin</code> of the application server process. Use this mode, when
+   * the FastCGI applications server process is under control of the web
+   * server.
+   *
+   * @param fd The file descriptor where the application server accepts new
+   *           connections.
+   */
+  void configureListen(enum FileDescriptor fd);
 
   /**
    * Tests whether the #start() operation was successful.
@@ -114,6 +143,7 @@ public slots:
    *
    * @see configureListen(const QHostAddress &address, quint16 port)
    * @see configureListen(const QString &path)
+   * @see configureListen(enum FileDescriptor fd)
    */
   void start();
 
