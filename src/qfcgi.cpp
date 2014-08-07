@@ -20,11 +20,10 @@
 
 #include "connection.h"
 #include "qfcgi.h"
+#include "tcpbuilder.h"
 
 QFCgi::QFCgi(QObject *parent) : QObject(parent) {
-  this->server = 0;
-  this->listenAddress = QHostAddress::Any;
-  this->listenPort = 9000;
+  this->builder = new QFCgiTcpConnectionBuilder(QHostAddress::Any, 9000, this);
 }
 
 QFCgi::~QFCgi() {
@@ -32,38 +31,35 @@ QFCgi::~QFCgi() {
 }
 
 void QFCgi::configureListen(const QHostAddress &address, quint16 port) {
-  this->listenAddress = address;
-  this->listenPort = port;
+  updateBuilder(new QFCgiTcpConnectionBuilder(address, port, this));
 }
 
 bool QFCgi::isStarted() const {
-  return (this->server != 0) && this->server->isListening();
+  return (this->builder != 0) && this->builder->isListening();
 }
 
 QString QFCgi::errorString() const {
-  if (this->server != 0) {
-    return this->server->errorString();
+  if (this->builder != 0) {
+    return this->builder->errorString();
   } else {
     return "not started";
   }
 }
 
 void QFCgi::start() {
-  this->server = new QTcpServer(this);
-
-  if (this->server->listen(this->listenAddress, this->listenPort)) {
-    connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    qDebug() << "FastCGI application started, listening on"
-             << this->server->serverAddress().toString()
-             << "/"
-             << this->server->serverPort();
+  if (this->builder->listen()) {
+    connect(this->builder, SIGNAL(newConnection(QFCgiConnection*)),
+            this, SLOT(onNewConnection(QFCgiConnection*)));
   } else {
-    qCritical() << "failed to start FastCGI application:" << this->server->errorString();
+    qCritical() << "failed to start FastCGI application:" << this->builder->errorString();
   }
 }
 
-void QFCgi::onNewConnection() {
-  QTcpSocket *so = this->server->nextPendingConnection();
-  QFCgiConnection *connection = new QFCgiConnection(so, this);
+void QFCgi::onNewConnection(QFCgiConnection *connection) {
   qDebug() << "[" << connection->getId() << "]" << "FastCGI connection accepted";
+}
+
+void QFCgi::updateBuilder(QFCgiConnectionBuilder *builder) {
+  delete this->builder;
+  this->builder = builder;
 }

@@ -25,11 +25,14 @@ SOURCES = \
   qfcgi.cpp \
   qfcgirequest.cpp \
   record.cpp \
-  stream.cpp
+  stream.cpp \
+  tcpbuilder.cpp
 
 HEADERS += \
+  builder.h \
   connection.h \
   qfcgi.h \
   qfcgirequest.h \
   record.h \
-  stream.h
+  stream.h \
+  tcpbuilder.h

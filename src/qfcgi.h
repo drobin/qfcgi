@@ -18,11 +18,12 @@
 #ifndef QFCGI_H
 #define QFCGI_H
 
-#include <QHostAddress>
 #include <QObject>
 
+class QFCgiConnection;
+class QFCgiConnectionBuilder;
 class QFCgiRequest;
-class QTcpServer;
+class QHostAddress;
 
 /**
  * FastCGI support for Qt.
@@ -103,14 +104,14 @@ public slots:
   void start();
 
 private slots:
-  void onNewConnection();
+  void onNewConnection(QFCgiConnection *connection);
 
 private:
   friend class QFCgiConnection;
 
-  QTcpServer *server;
-  QHostAddress listenAddress;
-  quint16 listenPort;
+  void updateBuilder(QFCgiConnectionBuilder *builder);
+
+  QFCgiConnectionBuilder *builder;
 };
 
 #endif  /* QFCGI_H */
