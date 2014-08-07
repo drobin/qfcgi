@@ -19,6 +19,7 @@
 #include <QTcpSocket>
 
 #include "connection.h"
+#include "localbuilder.h"
 #include "qfcgi.h"
 #include "tcpbuilder.h"
 
@@ -32,6 +33,10 @@ QFCgi::~QFCgi() {
 
 void QFCgi::configureListen(const QHostAddress &address, quint16 port) {
   updateBuilder(new QFCgiTcpConnectionBuilder(address, port, this));
+}
+
+void QFCgi::configureListen(const QString &path) {
+  updateBuilder(new QFCgiLocalConnectionBuilder(path, this));
 }
 
 bool QFCgi::isStarted() const {
