@@ -22,7 +22,6 @@
 #include <QObject>
 
 class QFCgiRequest;
-class QHostAddress;
 class QTcpServer;
 
 /**

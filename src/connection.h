@@ -24,13 +24,13 @@
 class QFCgi;
 class QFCgiRecord;
 class QFCgiRequest;
-class QTcpSocket;
+class QIODevice;
 
 class QFCgiConnection : public QObject {
   Q_OBJECT
 
 public:
-  QFCgiConnection(QTcpSocket *so, QFCgi *parent);
+  QFCgiConnection(QIODevice *device, QFCgi *parent);
   ~QFCgiConnection();
 
   int getId() const;
@@ -51,7 +51,7 @@ private:
   void handleFCGI_STDIN(QFCgiRecord &record);
 
   int id;
-  QTcpSocket *so;
+  QIODevice *device;
   QByteArray buf;
   QHash<int, QFCgiRequest*> requests;
 };

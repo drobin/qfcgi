@@ -15,9 +15,6 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QBuffer>
-#include <QTcpSocket>
-
 #include "connection.h"
 #include "qfcgi.h"
 #include "qfcgirequest.h"
@@ -43,16 +40,16 @@
 
 static int nextConnectionId = 0;
 
-QFCgiConnection::QFCgiConnection(QTcpSocket *so, QFCgi *parent) : QObject(parent) {
+QFCgiConnection::QFCgiConnection(QIODevice *device, QFCgi *parent) : QObject(parent) {
   this->id = ++nextConnectionId;
-  this->so = so;
+  this->device = device;
 
-  connect(this->so, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
-  connect(this->so, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
+  connect(this->device, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+  connect(this->device, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 }
 
 QFCgiConnection::~QFCgiConnection() {
-  delete so;
+  delete device;
 }
 
 int QFCgiConnection::getId() const {
@@ -61,11 +58,11 @@ int QFCgiConnection::getId() const {
 
 void QFCgiConnection::send(const QFCgiRecord &record) {
   q2Debug(record) << "sending record [ type:" << record.getType() << ", content-length:" << record.getContent().size() << "]";
-  record.write(this->so);
+  record.write(this->device);
 }
 
 void QFCgiConnection::closeConnection() {
-  this->so->disconnectFromHost();
+  this->device->close();
 }
 
 void QFCgiConnection::onReadyRead() {
@@ -95,16 +92,16 @@ void QFCgiConnection::onDisconnected() {
 }
 
 void QFCgiConnection::fillBuffer() {
-  qint64 avail = this->so->bytesAvailable();
+  qint64 avail = this->device->bytesAvailable();
   char buf[avail];
 
-  qint64 nread = this->so->read(buf, avail);
+  qint64 nread = this->device->read(buf, avail);
 
   if (nread >= 0) {
     q1Debug() << nread << "bytes read from socket";
     this->buf.append(buf, nread);
   } else {
-    q1Critical() << this->so->errorString();
+    q1Critical() << this->device->errorString();
     deleteLater();
   }
 }
