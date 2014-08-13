@@ -21,6 +21,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt4 REQUIRED QtCore QtNetwork)
 
+if (NOT DISABLE_TESTING)
+  enable_testing()
+  add_subdirectory(test)
+endif(NOT DISABLE_TESTING)
+
 add_definitions(-Wall -Werror)
 
 if (ENABLE_DEBUG)
