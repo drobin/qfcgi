@@ -15,5 +15,36 @@
 # along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-TEMPLATE = subdirs
-SUBDIRS = src
+cmake_minimum_required(VERSION 2.6)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(Qt4 REQUIRED QtCore QtNetwork)
+
+add_definitions(-Wall -Werror)
+
+if (ENABLE_DEBUG)
+  add_definitions(-g -O0)
+endif(ENABLE_DEBUG)
+
+add_library(qfcgi
+  src/builder.h
+  src/connection.cpp
+  src/connection.h
+  src/fdbuilder.cpp
+  src/fdbuilder.h
+  src/localbuilder.cpp
+  src/localbuilder.h
+  src/qfcgi.cpp
+  src/qfcgi.h
+  src/qfcgirequest.cpp
+  src/qfcgirequest.h
+  src/record.cpp
+  src/record.h
+  src/stream.cpp
+  src/stream.h
+  src/tcpbuilder.cpp
+  src/tcpbuilder.h
+)
+
+target_link_libraries(qfcgi Qt4::QtCore Qt4::QtNetwork)
