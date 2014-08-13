@@ -122,11 +122,12 @@ void QFCgiRecord::setType(QFCgiRecord::Type type) {
   this->type = type;
 }
 
-void QFCgiRecord::setType(quint8 type) {
+bool QFCgiRecord::setType(quint8 type) {
   if (type > 0 && type <= FCGI_UNKNOWN_TYPE) {
     this->type = (enum Type)type;
+    return true;
   } else {
-    this->type = FCGI_UNKNOWN_TYPE;
+    return false;
   }
 }
 
@@ -185,7 +186,10 @@ qint32 QFCgiRecord::readHeader(const QByteArray &ba, quint16 *contentLength, qui
     return -1;
   }
 
-  setType(ba[1] & 0xFF);
+  if (!setType(ba[1] & 0xFF)) {
+    return -1;
+  }
+
   this->requestId = ((ba[2] & 0xFF) << 8) | (ba[3] & 0xFF);
 
   *contentLength = ((ba[4] & 0xFF) << 8) | (ba[5] & 0xFF);

@@ -14,3 +14,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
 ##
+
+add_executable(test_record record.cpp)
+target_link_libraries(test_record Qt4::QtTest qfcgi)
+
+add_test(record test_record)
