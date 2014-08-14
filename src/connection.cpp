@@ -19,8 +19,8 @@
 
 #include "connection.h"
 #include "fcgi.h"
-#include "qfcgirequest.h"
 #include "record.h"
+#include "request.h"
 #include "stream.h"
 
 #define q1Debug() qDebug() << "[" << this->id << "]"

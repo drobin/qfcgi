@@ -42,10 +42,10 @@ add_library(qfcgi
   src/fdbuilder.h
   src/localbuilder.cpp
   src/localbuilder.h
-  src/qfcgirequest.cpp
-  src/qfcgirequest.h
   src/record.cpp
   src/record.h
+  src/request.cpp
+  src/request.h
   src/stream.cpp
   src/stream.h
   src/tcpbuilder.cpp

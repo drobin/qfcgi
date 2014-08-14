@@ -20,8 +20,8 @@
 #include <QtGlobal>
 
 #include "connection.h"
-#include "qfcgirequest.h"
 #include "record.h"
+#include "request.h"
 #include "stream.h"
 
 #define q2Debug() qDebug() << "[" << this->id << "]"
