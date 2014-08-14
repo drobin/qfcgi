@@ -42,6 +42,7 @@ add_library(qfcgi
   src/fdbuilder.h
   src/localbuilder.cpp
   src/localbuilder.h
+  src/qfcgi.h
   src/record.cpp
   src/record.h
   src/request.cpp
@@ -53,3 +54,13 @@ add_library(qfcgi
 )
 
 target_link_libraries(qfcgi Qt4::QtCore Qt4::QtNetwork)
+
+install(TARGETS qfcgi
+  ARCHIVE DESTINATION lib
+)
+install(FILES src/qfcgi.h
+  DESTINATION include
+)
+install(FILES src/fcgi.h src/request.h
+  DESTINATION include/qfcgi
+)
