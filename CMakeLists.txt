@@ -26,6 +26,10 @@ if (NOT DISABLE_TESTING)
   add_subdirectory(test)
 endif(NOT DISABLE_TESTING)
 
+if (NOT DISABLE_EXAMPLE)
+  add_subdirectory(example)
+endif(NOT DISABLE_EXAMPLE)
+
 add_definitions(-Wall -Werror)
 
 if (ENABLE_DEBUG)
