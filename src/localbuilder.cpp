@@ -19,8 +19,8 @@
 #include <QLocalSocket>
 
 #include "connection.h"
+#include "fcgi.h"
 #include "localbuilder.h"
-#include "qfcgi.h"
 
 QFCgiLocalConnectionBuilder::QFCgiLocalConnectionBuilder(const QString &path, QObject *parent)
   : QFCgiConnectionBuilder(parent) {

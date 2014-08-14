@@ -36,12 +36,12 @@ add_library(qfcgi
   src/builder.h
   src/connection.cpp
   src/connection.h
+  src/fcgi.cpp
+  src/fcgi.h
   src/fdbuilder.cpp
   src/fdbuilder.h
   src/localbuilder.cpp
   src/localbuilder.h
-  src/qfcgi.cpp
-  src/qfcgi.h
   src/qfcgirequest.cpp
   src/qfcgirequest.h
   src/record.cpp

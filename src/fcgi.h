@@ -15,8 +15,8 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QFCGI_H
-#define QFCGI_H
+#ifndef QFCGI_FCGI_H
+#define QFCGI_FCGI_H
 
 #include <QObject>
 
@@ -158,4 +158,4 @@ private:
   QFCgiConnectionBuilder *builder;
 };
 
-#endif  /* QFCGI_H */
+#endif  /* QFCGI_FCGI_H */

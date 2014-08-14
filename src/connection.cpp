@@ -18,7 +18,7 @@
 #include <QDebug>
 
 #include "connection.h"
-#include "qfcgi.h"
+#include "fcgi.h"
 #include "qfcgirequest.h"
 #include "record.h"
 #include "stream.h"

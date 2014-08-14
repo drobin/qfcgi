@@ -19,7 +19,7 @@
 #include <QTcpSocket>
 
 #include "connection.h"
-#include "qfcgi.h"
+#include "fcgi.h"
 #include "tcpbuilder.h"
 
 QFCgiTcpConnectionBuilder::QFCgiTcpConnectionBuilder(const QHostAddress &address, quint16 port, QObject *parent)

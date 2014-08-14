@@ -19,9 +19,9 @@
 #include <QTcpSocket>
 
 #include "connection.h"
+#include "fcgi.h"
 #include "fdbuilder.h"
 #include "localbuilder.h"
-#include "qfcgi.h"
 #include "tcpbuilder.h"
 
 QFCgi::QFCgi(QObject *parent) : QObject(parent) {

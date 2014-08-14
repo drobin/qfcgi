@@ -24,8 +24,8 @@
 #include <errno.h>
 
 #include "connection.h"
+#include "fcgi.h"
 #include "fdbuilder.h"
-#include "qfcgi.h"
 
 QFCgiFdConnectionBuilder::QFCgiFdConnectionBuilder(int fd, QObject *parent)
   : QFCgiConnectionBuilder(parent) {
