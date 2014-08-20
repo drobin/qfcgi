@@ -19,6 +19,8 @@
 
 #include "../src/record.h"
 
+#include "record_helper.h"
+
 class RecordTest: public QObject {
   Q_OBJECT
 
@@ -143,25 +145,6 @@ private slots:
 private:
   QFCgiRecord *record;
   QBuffer *buffer;
-
-  QByteArray binaryRecord(quint8 version, quint8 type, quint16 requestId, const QByteArray &content) {
-    QByteArray ba;
-    quint16 contentLength = content.size();
-    quint8 paddingLength;
-    quint8 reserved = 0;
-
-    paddingLength = contentLength % 8;
-    paddingLength = (paddingLength > 0) ? 8 - paddingLength : 0;
-
-    return QByteArray().append(version)
-      .append(type)
-      .append((requestId >> 8) & 0xFF).append(requestId & 0xFF)
-      .append((contentLength >> 8) & 0xFF).append(contentLength & 0xFF)
-      .append(paddingLength)
-      .append(reserved)
-      .append(content)
-      .append(QByteArray(paddingLength, 0));
-  }
 };
 
 QTEST_MAIN(RecordTest)
