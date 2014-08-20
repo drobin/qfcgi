@@ -18,4 +18,8 @@
 add_executable(test_record record.cpp)
 target_link_libraries(test_record Qt4::QtTest qfcgi)
 
+add_executable(test_request request.cpp)
+target_link_libraries(test_request Qt4::QtTest qfcgi)
+
 add_test(record test_record)
+add_test(request test_request)

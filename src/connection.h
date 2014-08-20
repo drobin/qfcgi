@@ -47,8 +47,8 @@ private:
   void handleManagementRecord(QFCgiRecord &record);
   void handleApplicationRecord(QFCgiRecord &record);
   void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
-  void handleFCGI_PARAMS(QFCgiRecord &record);
-  void handleFCGI_STDIN(QFCgiRecord &record);
+  void handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record);
+  void handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &record);
 
   int id;
   QIODevice *device;

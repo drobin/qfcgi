@@ -113,10 +113,18 @@ void QFCgiConnection::handleManagementRecord(QFCgiRecord &record) {
 }
 
 void QFCgiConnection::handleApplicationRecord(QFCgiRecord &record) {
+  QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
+
+  if (request == 0 && record.getType() != QFCgiRecord::FCGI_BEGIN_REQUEST) {
+    q2Critical(record) << "no such request";
+    deleteLater();
+    return;
+  }
+
   switch (record.getType()) {
     case QFCgiRecord::FCGI_BEGIN_REQUEST: handleFCGI_BEGIN_REQUEST(record); break;
-    case QFCgiRecord::FCGI_PARAMS: handleFCGI_PARAMS(record); break;
-    case QFCgiRecord::FCGI_STDIN: handleFCGI_STDIN(record); break;
+    case QFCgiRecord::FCGI_PARAMS: handleFCGI_PARAMS(request, record); break;
+    case QFCgiRecord::FCGI_STDIN: handleFCGI_STDIN(request, record); break;
     default: q2Critical(record) << "invalid record of type" << record.getType();
   }
 }
@@ -140,15 +148,7 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   q2Debug(record) << "new FastCGI request [ role:" << role << ", keep_conn:" << keep_conn << "]";
 }
 
-void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
-  QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
-
-  if (request == 0) {
-    q2Critical(record) << "no such request";
-    deleteLater();
-    return;
-  }
-
+void QFCgiConnection::handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record) {
   const QByteArray &ba = record.getContent();
 
   if (!ba.isEmpty()) {
@@ -161,15 +161,7 @@ void QFCgiConnection::handleFCGI_PARAMS(QFCgiRecord &record) {
   }
 }
 
-void QFCgiConnection::handleFCGI_STDIN(QFCgiRecord &record) {
-  QFCgiRequest *request = this->requests.value(record.getRequestId(), 0);
-
-  if (request == 0) {
-    q2Critical(record) << "no such request";
-    deleteLater();
-    return;
-  }
-
+void QFCgiConnection::handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &record) {
   const QByteArray &ba = record.getContent();
 
   if (!ba.isEmpty()) {
