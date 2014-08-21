@@ -45,13 +45,15 @@ static int nextConnectionId = 0;
 QFCgiConnection::QFCgiConnection(QIODevice *device, QFCgi *parent) : QObject(parent) {
   this->id = ++nextConnectionId;
   this->device = device;
+  this->device->setParent(this); /* Take over ownership of the device.
+                                    You it is safe to destroy the object here. */
 
   connect(this->device, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
   connect(this->device, SIGNAL(disconnected()), this, SLOT(onDisconnected()));
 }
 
 QFCgiConnection::~QFCgiConnection() {
-  delete device;
+  delete this->device;
 }
 
 int QFCgiConnection::getId() const {

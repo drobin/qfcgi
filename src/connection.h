@@ -31,7 +31,7 @@ class QFCgiConnection : public QObject {
 
 public:
   QFCgiConnection(QIODevice *device, QFCgi *parent);
-  ~QFCgiConnection();
+  virtual ~QFCgiConnection();
 
   int getId() const;
 
