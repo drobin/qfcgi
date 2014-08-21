@@ -27,7 +27,7 @@ class QFCgiLocalConnectionBuilder : public QFCgiConnectionBuilder {
 
 public:
   QFCgiLocalConnectionBuilder(const QString &path, QObject *parent = 0);
-  ~QFCgiLocalConnectionBuilder();
+  virtual ~QFCgiLocalConnectionBuilder();
 
   bool listen();
   bool isListening() const;

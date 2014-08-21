@@ -27,7 +27,7 @@ class QFCgiFdConnectionBuilder : public QFCgiConnectionBuilder {
 
 public:
   QFCgiFdConnectionBuilder(int fd,QObject *parent = 0);
-  ~QFCgiFdConnectionBuilder();
+  virtual ~QFCgiFdConnectionBuilder();
 
   bool listen();
   bool isListening() const;

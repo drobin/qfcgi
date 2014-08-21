@@ -153,7 +153,7 @@ private:
   friend class QFCgiConnection;
 
   QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent);
-  ~QFCgiRequest() {}
+  virtual ~QFCgiRequest() {}
 
   void consumeParamsBuffer(const QByteArray &data);
   qint32 readNameValuePair(QString &name, QString &value);
