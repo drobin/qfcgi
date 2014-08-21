@@ -34,6 +34,8 @@ add_definitions(-Wall -Werror)
 
 if (ENABLE_DEBUG)
   add_definitions(-g -O0)
+else(ENABLE_DEBUG)
+  add_definitions(-DQT_NO_DEBUG_OUTPUT -DQT_NO_WARNING_OUTPUT)
 endif(ENABLE_DEBUG)
 
 add_library(qfcgi

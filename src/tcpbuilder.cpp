@@ -36,10 +36,9 @@ QFCgiTcpConnectionBuilder::~QFCgiTcpConnectionBuilder() {
 bool QFCgiTcpConnectionBuilder::listen() {
   if (this->server->listen(this->address, this->port)) {
     connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    qDebug() << "FastCGI application started, listening on"
-             << this->server->serverAddress().toString()
-             << "/"
-             << this->server->serverPort();
+    qDebug("FastCGI application started, listening on %s/%d",
+      qPrintable(this->server->serverAddress().toString()),
+      this->server->serverPort());
     return true;
   } else {
     return false;

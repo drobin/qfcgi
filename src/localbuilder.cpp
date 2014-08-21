@@ -35,8 +35,8 @@ QFCgiLocalConnectionBuilder::~QFCgiLocalConnectionBuilder() {
 bool QFCgiLocalConnectionBuilder::listen() {
   if (this->server->listen(this->path)) {
     connect(this->server, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    qDebug() << "FastCGI application started, listening on"
-             << this->server->fullServerName();
+    qDebug("FastCGI application started, listening on %s",
+      qPrintable(this->server->fullServerName()));
     return true;
   } else {
     return false;

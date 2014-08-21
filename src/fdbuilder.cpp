@@ -15,7 +15,6 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include <QLocalSocket>
 #include <QSocketNotifier>
 
@@ -40,8 +39,7 @@ QFCgiFdConnectionBuilder::~QFCgiFdConnectionBuilder() {
 bool QFCgiFdConnectionBuilder::listen() {
   this->notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
   connect(this->notifier, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
-  qDebug() << "FastCGI application started, listening on"
-           << this->notifier->socket();
+  qDebug("FastCGI application started, listening on %d", this->notifier->socket());
   return true;
 }
 
@@ -65,6 +63,6 @@ void QFCgiFdConnectionBuilder::onActivated(int socket) {
     QFCgiConnection *connection = new QFCgiConnection(device, fcgi);
     emit newConnection(connection);
   } else {
-    qCritical() << "accept" << strerror(errno);
+    qDebug("accept: %s", strerror(errno));
   }
 }

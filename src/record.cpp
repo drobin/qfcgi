@@ -15,7 +15,6 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDebug>
 #include <QIODevice>
 
 #include "record.h"

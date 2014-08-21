@@ -61,12 +61,12 @@ void QFCgi::start() {
     connect(this->builder, SIGNAL(newConnection(QFCgiConnection*)),
             this, SLOT(onNewConnection(QFCgiConnection*)));
   } else {
-    qCritical() << "failed to start FastCGI application:" << this->builder->errorString();
+    qDebug("failed to start FastCGI application: %s", qPrintable(this->builder->errorString()));
   }
 }
 
 void QFCgi::onNewConnection(QFCgiConnection *connection) {
-  qDebug() << "[" << connection->getId() << "]" << "FastCGI connection accepted";
+  qDebug("[%d] FastCGI connection accepted", connection->getId());
 }
 
 void QFCgi::updateBuilder(QFCgiConnectionBuilder *builder) {

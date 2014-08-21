@@ -16,7 +16,6 @@
  */
 
 #include <QBuffer>
-#include <QDebug>
 #include <QtGlobal>
 
 #include "connection.h"
@@ -24,7 +23,7 @@
 #include "request.h"
 #include "stream.h"
 
-#define q2Debug() qDebug() << "[" << this->id << "]"
+#define q2Debug(format, args...) qDebug("[%d] " format, this->id, ##args)
 
 QFCgiRequest::QFCgiRequest(int id, bool keepConn, QFCgiConnection *parent) : QObject(parent) {
   this->id = id;
@@ -57,7 +56,7 @@ void QFCgiRequest::endRequest(quint32 appStatus) {
   connection->send(QFCgiRecord::createEndRequest(this->id, appStatus, QFCgiRecord::FCGI_REQUEST_COMPLETE));
 
   if (!keepConnection()) {
-    q2Debug() << "endRequest - about to close connection";
+    q2Debug("endRequest - about to close connection");
     connection->closeConnection();
   }
 }
@@ -111,7 +110,7 @@ void QFCgiRequest::consumeParamsBuffer(const QByteArray &data) {
   this->paramsBuffer.append(data);
 
   while ((nread = readNameValuePair(name, value)) > 0) {
-    q2Debug() << "param(" << name << ") =" << value;
+    q2Debug("param(%s): %s", qPrintable(name), qPrintable(value));
     this->paramsBuffer.remove(0, nread);
     this->params.insert(name, value);
   }
