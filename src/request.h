@@ -20,6 +20,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QMetaType>
 
 class QFCgiConnection;
 class QFCgiStream;
@@ -168,5 +169,7 @@ private:
   QFCgiStream *err;
   QHash<QString, QString> params;
 };
+
+Q_DECLARE_METATYPE(QFCgiRequest*);
 
 #endif  /* QFCGI_REQUEST_H */

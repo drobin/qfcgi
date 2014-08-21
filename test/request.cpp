@@ -20,16 +20,22 @@
 #include <QTcpSocket>
 
 #include "../src/fcgi.h"
+#include "../src/request.h"
 
+#include "param_helper.h"
 #include "record_helper.h"
 
 class RequestTest: public QObject {
   Q_OBJECT
 
 private slots:
+  void initTestCase() {
+    qRegisterMetaType<QFCgiRequest*>();
+  }
+
   void init() {
     this->fcgi = new QFCgi(this);
-    this->fcgi->configureListen(QHostAddress::Any, 8000);
+    this->fcgi->configureListen(QHostAddress::LocalHost, 8000);
     this->fcgi->start();
     QVERIFY(this->fcgi->isStarted());
 
@@ -60,10 +66,123 @@ private slots:
     loop->exec();
   }
 
+  void newRequestNoParams() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+    QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
+
+    QSignalSpy spy(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)));
+    QObject::connect(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)), loop, SLOT(quit()));
+    loop->exec();
+
+    QFCgiRequest *request = qvariant_cast<QFCgiRequest*>(spy.at(0).at(0));
+    QVERIFY(request != 0);
+
+    QCOMPARE(request->getParams().count(), 0);
+
+    request->endRequest(0);
+  }
+
+  void newRequestParamsOneRecord() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+
+    QByteArray params = encodeParam("k1", "v1").append(encodeParam("k2", "v2"));
+    QVERIFY(this->so->write(binaryParam(1, params)) > 0);
+    QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
+
+    QSignalSpy spy(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)));
+    QObject::connect(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)), loop, SLOT(quit()));
+    loop->exec();
+
+    QFCgiRequest *request = qvariant_cast<QFCgiRequest*>(spy.at(0).at(0));
+    QVERIFY(request != 0);
+
+    QCOMPARE(request->getParams().count(), 2);
+    QCOMPARE(request->getParam("k1"), QString("v1"));
+    QCOMPARE(request->getParam("k2"), QString("v2"));
+
+    request->endRequest(0);
+  }
+
+  void newRequestParamsOneRecordBigKey() {
+    const QString bigKey = bigString("abc", 44);
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+
+    QByteArray params = encodeParam(bigKey, "v1").append(encodeParam("k2", "v2"));
+    QVERIFY(this->so->write(binaryParam(1, params)) > 0);
+    QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
+
+    QSignalSpy spy(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)));
+    QObject::connect(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)), loop, SLOT(quit()));
+    loop->exec();
+
+    QFCgiRequest *request = qvariant_cast<QFCgiRequest*>(spy.at(0).at(0));
+    QVERIFY(request != 0);
+
+    QCOMPARE(request->getParams().count(), 2);
+    QCOMPARE(request->getParam(bigKey), QString("v1"));
+    QCOMPARE(request->getParam("k2"), QString("v2"));
+
+    request->endRequest(0);
+  }
+
+  void newRequestParamsOneRecordBigValue() {
+    const QString bigValue = bigString("abc", 44);
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+
+    QByteArray params = encodeParam("k1", bigValue).append(encodeParam("k2", "v2"));
+    QVERIFY(this->so->write(binaryParam(1, params)) > 0);
+    QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
+
+    QSignalSpy spy(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)));
+    QObject::connect(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)), loop, SLOT(quit()));
+    loop->exec();
+
+    QFCgiRequest *request = qvariant_cast<QFCgiRequest*>(spy.at(0).at(0));
+    QVERIFY(request != 0);
+
+    QCOMPARE(request->getParams().count(), 2);
+    QCOMPARE(request->getParam("k1"), bigValue);
+    QCOMPARE(request->getParam("k2"), QString("v2"));
+
+    request->endRequest(0);
+  }
+
+  void newRequestParamsTwoRecords() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+
+    QByteArray params = encodeParam("k1", "v123456").append(encodeParam("k2", "v2"));
+    QVERIFY(this->so->write(binaryParam(1, params.left(params.count() / 2))) > 0);
+    QVERIFY(this->so->write(binaryParam(1, params.mid(params.count() / 2))) > 0);
+    QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
+
+    QSignalSpy spy(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)));
+    QObject::connect(this->fcgi, SIGNAL(newRequest(QFCgiRequest*)), loop, SLOT(quit()));
+    loop->exec();
+
+    QFCgiRequest *request = qvariant_cast<QFCgiRequest*>(spy.at(0).at(0));
+    QVERIFY(request != 0);
+
+    QCOMPARE(request->getParams().count(), 2);
+    QCOMPARE(request->getParam("k1"), QString("v123456"));
+    QCOMPARE(request->getParam("k2"), QString("v2"));
+
+    request->endRequest(0);
+  }
+
 private:
   QFCgi *fcgi;
   QTcpSocket *so;
   QEventLoop *loop;
+
+  QString bigString(const QString &in, int count) {
+    QByteArray ba;
+
+    for (int i = 0; i < count; i++) {
+      ba.append(in);
+    }
+
+    return ba;
+  }
 };
 
 QTEST_MAIN(RequestTest)

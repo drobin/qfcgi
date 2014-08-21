@@ -147,9 +147,8 @@ qint32 QFCgiRequest::readLengthField(int pos, quint32 *length) {
     return 0;
   }
 
-  *length = ba[0] & 0xFF;
-
-  if (*length >> 7 == 0) {
+  if ((ba[0] & 0x80) == 0) {
+    *length = ba[0] & 0xFF;
     return 1;
   }
 
@@ -157,10 +156,10 @@ qint32 QFCgiRequest::readLengthField(int pos, quint32 *length) {
     return 0;
   }
 
-  for (int i = 1; i < 4; i++) {
-    *length <<= 8;
-    *length |= (ba[i] & 0xFF);
-  }
+  *length = ((ba[0] & 0x7F) << 24) |
+            ((ba[1] & 0xFF) << 16) |
+            ((ba[2] & 0xFF) << 8) |
+            (ba[3] & 0xFF);
 
   return 4;
 }

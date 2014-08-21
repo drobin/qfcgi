@@ -37,4 +37,19 @@ QByteArray binaryRecord(quint8 version, quint8 type, quint16 requestId, const QB
     .append(QByteArray(paddingLength, 0));
 }
 
+QByteArray binaryBeginRequest(quint16 requestId, quint16 role, bool keepConnection) {
+  QByteArray content;
+  const char reserved[5] = { 0 };
+
+  content.append((role >> 8) & 0xFF).append(role & 0xFF)  // role
+    .append(keepConnection ? 1 : 0)                       // flags
+    .append(reserved);                                    // reserved
+
+  return binaryRecord(1, 1, requestId, content);
+}
+
+QByteArray binaryParam(quint16 requestId, const QByteArray &params) {
+  return binaryRecord(1, 4, requestId, params);
+}
+
 #endif  /* QFCGI_TEST_RECORD_HELPER_H */
