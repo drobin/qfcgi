@@ -134,9 +134,18 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
 
   if (role == FCGI_RESPONDER) {
-    QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
-    this->requests.insert(request->getId(), request);
-    q2Debug(record, "new FastCGI request [role: %d, keep_conn: %d]", role, keep_conn);
+    if (this->requests.contains(record.getRequestId())) {
+      q2Debug(record, "new FastCGI request (invalid request-id) [role: %d, keep_conn: %d]", role, keep_conn);
+
+      QFCgiRecord response = QFCgiRecord::createEndRequest(record.getRequestId(), 0, QFCgiRecord::FCGI_OVERLOADED);
+      send(response);
+
+      closeConnection();
+    } else {
+      QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
+      this->requests.insert(request->getId(), request);
+      q2Debug(record, "new FastCGI request [role: %d, keep_conn: %d]", role, keep_conn);
+    }
   } else {
     bool valid = validateRole(role);
 

@@ -98,6 +98,17 @@ private slots:
     verifyEndRequest(this->so, 1, 0, 3);
   }
 
+  void newRequestInvalidRequestId() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
+    QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0); // a second request with the same request-id
+
+    QObject::connect(this->so, SIGNAL(disconnected()), loop, SLOT(quit()));
+    loop->exec();
+
+    QVERIFY(this->so->bytesAvailable() == 16);
+    verifyEndRequest(this->so, 1, 0, 2);
+  }
+
   void newRequestNoParams() {
     QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
     QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
