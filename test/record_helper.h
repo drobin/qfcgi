@@ -52,4 +52,35 @@ QByteArray binaryParam(quint16 requestId, const QByteArray &params) {
   return binaryRecord(1, 4, requestId, params);
 }
 
+void verifyEnvelope(QIODevice *dev, quint8 type, quint16 requestId, quint16 *contentLength, quint8 *paddingLength) {
+  char data[8] = { 0 };
+
+  QVERIFY(dev->read(data, sizeof(data)) == 8);
+
+  QVERIFY(data[0] == 1); // version
+  QVERIFY((data[1] & 0xFF) == type); // type
+  QVERIFY((((data[2] & 0xFF) << 8) | (data[3] & 0xFF)) == requestId); // request id
+
+  *contentLength = ((data[4] & 0xFF) << 8) | (data[5] & 0xFF);
+  *paddingLength = data[6] & 0xFF;
+  // data[7] := reserved
+}
+
+void verifyEndRequest(QIODevice *dev, quint16 requestId, quint32 appStatus, quint8 protocolStatus) {
+  quint16 contentLength;
+  quint8 paddingLength;
+  quint32 u32;
+
+  verifyEnvelope(dev, 3, requestId, &contentLength, &paddingLength);
+  QVERIFY(contentLength == 8);
+  QVERIFY(paddingLength == 0);
+
+  char content[8];
+  QVERIFY(dev->read(content, sizeof(content)) == 8);
+  u32 = ((content[0] & 0xFF) << 24) | (content[1] & 0xFF) << 16 |
+    ((content[2] & 0xFF) << 8) | (content[3] & 0xFF);
+  QVERIFY(appStatus == u32);
+  QVERIFY((content[4] & 0xFF) == protocolStatus);
+}
+
 #endif  /* QFCGI_TEST_RECORD_HELPER_H */

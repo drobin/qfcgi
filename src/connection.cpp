@@ -133,17 +133,24 @@ void QFCgiConnection::handleFCGI_BEGIN_REQUEST(QFCgiRecord &record) {
   quint8 flags = ba[2];
   bool keep_conn = ((flags & FCGI_KEEP_CONN) > 0);
 
-  if (role != FCGI_RESPONDER) {
-    q2Debug(record, "new FastCGI request (unsupported role) [role: %d, keep_conn: %d]", role, keep_conn);
+  if (role == FCGI_RESPONDER) {
+    QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
+    this->requests.insert(request->getId(), request);
+    q2Debug(record, "new FastCGI request [role: %d, keep_conn: %d]", role, keep_conn);
+  } else {
+    bool valid = validateRole(role);
+
+    q2Debug(record, "new FastCGI request (%s role) [role: %d, keep_conn: %d]",
+      (valid ? "unsupported" : "invalid"), role, keep_conn);
+
     QFCgiRecord response = QFCgiRecord::createEndRequest(record.getRequestId(), 0, QFCgiRecord::FCGI_UNKNOWN_ROLE);
     send(response);
 
-    return;
+    if (!valid) {
+      // an invalid role will always close the connection
+      closeConnection();
+    }
   }
-
-  QFCgiRequest *request = new QFCgiRequest(record.getRequestId(), keep_conn, this);
-  this->requests.insert(request->getId(), request);
-  q2Debug(record, "new FastCGI request [role: %d, keep_conn: %d]", role, keep_conn);
 }
 
 void QFCgiConnection::handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record) {
@@ -168,5 +175,16 @@ void QFCgiConnection::handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &recor
   } else {
     q2Debug(record, "FCGI_STDIN (end of stream)");
     request->in->setEof();
+  }
+}
+
+bool QFCgiConnection::validateRole(quint16 role) const {
+  switch (role) {
+    case FCGI_RESPONDER:
+    case FCGI_AUTHORIZER:
+    case FCGI_FILTER:
+      return true;
+    default:
+      return false;
   }
 }

@@ -49,6 +49,7 @@ private:
   void handleFCGI_BEGIN_REQUEST(QFCgiRecord &record);
   void handleFCGI_PARAMS(QFCgiRequest *request, QFCgiRecord &record);
   void handleFCGI_STDIN(QFCgiRequest *request, QFCgiRecord &record);
+  bool validateRole(quint16 role) const;
 
   int id;
   QIODevice *device;

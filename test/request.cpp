@@ -66,6 +66,38 @@ private slots:
     loop->exec();
   }
 
+  void newRequestRoleAuthorizer() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 2, 1)) > 0);
+
+    QObject::connect(this->so, SIGNAL(readyRead()), loop, SLOT(quit()));
+    while (this->so->bytesAvailable() < 16) {
+      loop->exec();
+    }
+
+    verifyEndRequest(this->so, 1, 0, 3);
+  }
+
+  void newRequestRoleFilter() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 3, 1)) > 0);
+
+    QObject::connect(this->so, SIGNAL(readyRead()), loop, SLOT(quit()));
+    while (this->so->bytesAvailable() < 16) {
+      loop->exec();
+    }
+
+    verifyEndRequest(this->so, 1, 0, 3);
+  }
+
+  void newRequestRoleUnknown() {
+    QVERIFY(this->so->write(binaryBeginRequest(1, 4, 0)) > 0); /* keep_conn = false, connection is closed anyway */
+
+    QObject::connect(this->so, SIGNAL(disconnected()), loop, SLOT(quit()));
+    loop->exec();
+
+    QVERIFY(this->so->bytesAvailable() == 16);
+    verifyEndRequest(this->so, 1, 0, 3);
+  }
+
   void newRequestNoParams() {
     QVERIFY(this->so->write(binaryBeginRequest(1, 1, 0)) > 0);
     QVERIFY(this->so->write(binaryParam(1, QByteArray())) > 0);
