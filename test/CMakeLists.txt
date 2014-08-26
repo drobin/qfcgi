@@ -15,11 +15,15 @@
 # along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+add_executable(test_stream stream.cpp test_stream.h)
+target_link_libraries(test_stream Qt4::QtTest qfcgi)
+
 add_executable(test_record record.cpp)
 target_link_libraries(test_record Qt4::QtTest qfcgi)
 
 add_executable(test_request request.cpp)
 target_link_libraries(test_request Qt4::QtTest qfcgi)
 
+add_test(stream test_stream)
 add_test(record test_record)
 add_test(request test_request)

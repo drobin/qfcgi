@@ -15,33 +15,23 @@
  * along with QFCgi. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef QFCGI_STREAM_H
-#define QFCGI_STREAM_H
+#ifndef QFCGI_TEST_STREAM_H
+#define QFCGI_TEST_STREAM_H
 
-#include <QIODevice>
+#include "../src/stream.h"
 
-class QFCgiStream : public QIODevice {
+class TestStream : public QFCgiStream {
   Q_OBJECT
 
 public:
-  QFCgiStream(QObject *parent = 0);
-  virtual ~QFCgiStream();
+  TestStream(QObject *parent = 0) : QFCgiStream(parent) {}
+  ~TestStream() {}
 
-  bool atEnd() const;
-  qint64 bytesAvailable() const;
-  bool isSequential() const;
-
-  QByteArray& getBuffer();
-  bool append(const QByteArray &ba);
-  bool setEof();
-
-protected:
-  qint64 readData(char *data, qint64 maxSize);
-  qint64 writeData(const char *data, qint64 maxSize);
-
-private:
-  QByteArray buffer;
-  bool eof;
+public slots:
+  void closeSlot() { this->close(); }
+  void writeSlot() { this->write("\1\2\3", 3); }
+  void setEofSlot() { this->setEof(); }
+  void appendSlot() { this->append(QByteArray("\1\2\3", 3)); }
 };
 
-#endif  /* QFCGI_STREAM_H */
+#endif  /* QFCGI_TEST_STREAM_H */
