@@ -39,24 +39,24 @@ else(ENABLE_DEBUG)
 endif(ENABLE_DEBUG)
 
 add_library(qfcgi
-  src/builder.h
-  src/connection.cpp
-  src/connection.h
-  src/fcgi.cpp
-  src/fcgi.h
-  src/fdbuilder.cpp
-  src/fdbuilder.h
-  src/localbuilder.cpp
-  src/localbuilder.h
   src/qfcgi.h
-  src/record.cpp
-  src/record.h
-  src/request.cpp
-  src/request.h
-  src/stream.cpp
-  src/stream.h
-  src/tcpbuilder.cpp
-  src/tcpbuilder.h
+  src/qfcgi/builder.h
+  src/qfcgi/connection.cpp
+  src/qfcgi/connection.h
+  src/qfcgi/fcgi.cpp
+  src/qfcgi/fcgi.h
+  src/qfcgi/fdbuilder.cpp
+  src/qfcgi/fdbuilder.h
+  src/qfcgi/localbuilder.cpp
+  src/qfcgi/localbuilder.h
+  src/qfcgi/record.cpp
+  src/qfcgi/record.h
+  src/qfcgi/request.cpp
+  src/qfcgi/request.h
+  src/qfcgi/stream.cpp
+  src/qfcgi/stream.h
+  src/qfcgi/tcpbuilder.cpp
+  src/qfcgi/tcpbuilder.h
 )
 
 target_link_libraries(qfcgi Qt4::QtCore Qt4::QtNetwork)
@@ -67,6 +67,6 @@ install(TARGETS qfcgi
 install(FILES src/qfcgi.h
   DESTINATION include
 )
-install(FILES src/fcgi.h src/request.h
+install(FILES src/qfcgi/fcgi.h src/qfcgi/request.h
   DESTINATION include/qfcgi
 )

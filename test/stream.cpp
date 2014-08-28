@@ -18,7 +18,7 @@
 #include <QtTest/QtTest>
 
 #include "test_stream.h"
-#include "../src/stream.h"
+#include "../src/qfcgi/stream.h"
 
 class StreamTest: public QObject {
   Q_OBJECT

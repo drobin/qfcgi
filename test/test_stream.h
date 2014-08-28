@@ -18,7 +18,7 @@
 #ifndef QFCGI_TEST_STREAM_H
 #define QFCGI_TEST_STREAM_H
 
-#include "../src/stream.h"
+#include "../src/qfcgi/stream.h"
 
 class TestStream : public QFCgiStream {
   Q_OBJECT

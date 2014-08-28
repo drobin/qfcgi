@@ -19,8 +19,8 @@
 #include <QHostAddress>
 #include <QTcpSocket>
 
-#include "../src/fcgi.h"
-#include "../src/request.h"
+#include "../src/qfcgi/fcgi.h"
+#include "../src/qfcgi/request.h"
 
 #include "param_helper.h"
 #include "record_helper.h"

@@ -17,7 +17,7 @@
 
 #include <QtTest/QtTest>
 
-#include "../src/record.h"
+#include "../src/qfcgi/record.h"
 
 #include "record_helper.h"
 

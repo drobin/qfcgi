@@ -18,7 +18,7 @@
 #ifndef QFCGI_H
 #define QFCGI_H
 
-#include <qfcgi/fcgi.h>
-#include <qfcgi/request.h>
+#include "qfcgi/fcgi.h"
+#include "qfcgi/request.h"
 
 #endif  /* QFCGI_H */
