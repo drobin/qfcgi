@@ -17,3 +17,4 @@
 
 add_executable(qfcgiapp qfcgiapp.cpp)
 target_link_libraries(qfcgiapp qfcgi)
+include_directories(${PROJECT_SOURCE_DIR}/src)

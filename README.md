@@ -23,6 +23,9 @@ A common pattern can look like this:
 4. Start the FastCGI system.
 5. Wait for incoming requests.
 
+Have a look into the [example directory](example/) where you can get through
+some real examples.
+
 Prerequisites
 -------------
 
