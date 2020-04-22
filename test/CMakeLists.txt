@@ -16,13 +16,13 @@
 ##
 
 add_executable(test_stream stream.cpp test_stream.h)
-target_link_libraries(test_stream Qt4::QtTest qfcgi)
+target_link_libraries(test_stream Qt5::Test qfcgi)
 
 add_executable(test_record record.cpp)
-target_link_libraries(test_record Qt4::QtTest qfcgi)
+target_link_libraries(test_record Qt5::Test qfcgi)
 
 add_executable(test_request request.cpp)
-target_link_libraries(test_request Qt4::QtTest qfcgi)
+target_link_libraries(test_request Qt5::Test qfcgi)
 
 add_test(stream test_stream)
 add_test(record test_record)
