@@ -39,7 +39,7 @@ QFCgiFdConnectionBuilder::~QFCgiFdConnectionBuilder() {
 bool QFCgiFdConnectionBuilder::listen() {
   this->notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
   connect(this->notifier, SIGNAL(activated(int)), this, SLOT(onActivated(int)));
-  qDebug("FastCGI application started, listening on %d", this->notifier->socket());
+  qDebug("FastCGI application started, listening on %llu", this->notifier->socket());
   return true;
 }
 

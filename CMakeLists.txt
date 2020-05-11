@@ -19,7 +19,7 @@ cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-find_package(Qt4 REQUIRED QtCore QtNetwork)
+find_package(Qt5 REQUIRED Core Network Test)
 
 if (NOT DISABLE_TESTING)
   enable_testing()
@@ -31,6 +31,8 @@ if (NOT DISABLE_EXAMPLE)
 endif(NOT DISABLE_EXAMPLE)
 
 add_definitions(-Wall -Werror)
+
+set(ENABLE_DEBUG ON)
 
 if (ENABLE_DEBUG)
   add_definitions(-g -O0)
@@ -59,7 +61,7 @@ add_library(qfcgi
   src/qfcgi/tcpbuilder.h
 )
 
-target_link_libraries(qfcgi Qt4::QtCore Qt4::QtNetwork)
+target_link_libraries(qfcgi Qt5::Core Qt5::Network)
 
 install(TARGETS qfcgi
   ARCHIVE DESTINATION lib
